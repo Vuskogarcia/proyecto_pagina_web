@@ -31,11 +31,13 @@ Responsable técnico / Desarrollador: encargado principalmente del desarrollo de
 Responsable de diseño, pruebas y documentación: encargado principalmente del diseño de la interfaz y experiencia de usuario, la realización de pruebas, identificación de errores y elaboración de la documentación del proyecto.
 
 2. Toma de decisiones
+   
 Las decisiones importantes del proyecto serán discutidas entre los tres integrantes y se buscará llegar a un consenso. Cada integrante tendrá derecho a expresar su opinión y participar en la toma de decisiones.
 Cuando no sea posible llegar a un acuerdo, la decisión se tomará por mayoría simple, es decir, con el voto favorable de al menos dos de los tres integrantes.
 Las decisiones relacionadas con aspectos técnicos serán analizadas por todo el equipo, teniendo en cuenta la experiencia y responsabilidad del integrante encargado del área técnica.
 
 3. Participación y cumplimiento de tareas
+   
 Cada integrante será responsable de cumplir las tareas que le sean asignadas dentro de los tiempos establecidos. En caso de que un integrante no pueda cumplir con una actividad, deberá comunicarlo oportunamente al equipo para buscar una solución.
 Si un integrante presenta una falta de participación o incumplimiento reiterado, se procederá de la siguiente manera:
 
