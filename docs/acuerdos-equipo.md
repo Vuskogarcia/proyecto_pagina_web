@@ -25,7 +25,9 @@ Acuerdos de equipo y política de IA
 1. Roles del equipo
 
 Líder / Coordinador del proyecto: encargado de organizar las actividades, realizar seguimiento al cumplimiento de las tareas, coordinar las reuniones y facilitar la comunicación entre los integrantes.
+
 Responsable técnico / Desarrollador: encargado principalmente del desarrollo del sistema, la implementación de la lógica de negocio, la base de datos, el backend y la integración de las diferentes funcionalidades.
+
 Responsable de diseño, pruebas y documentación: encargado principalmente del diseño de la interfaz y experiencia de usuario, la realización de pruebas, identificación de errores y elaboración de la documentación del proyecto.
 
 2. Toma de decisiones
