@@ -1,8 +1,11 @@
 Roles del equipo
-Integrante	Rol	Responsabilidades principales
-Esteban Pinilla Vela Líder / Coordinador del proyecto	Organizar tareas, hacer seguimiento al avance, coordinar reuniones y ayudar a resolver desacuerdos.
-Brandon Eduardo Quintero Ayala	Desarrollador / Responsable técnico	Desarrollo del sistema, base de datos, backend, lógica del sistema e integración de funcionalidades.
-Kevin Vuskovit Garcia Gonzalez	Diseño / QA y documentación	Diseño de interfaz, experiencia de usuario, pruebas del sistema, identificación de errores y documentación.
+
+| Integrante                         | Rol                                 | Responsabilidades principales                                                                               |
+| ---------------------------------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| **Esteban Pinilla Vela**           | Líder / Coordinador del proyecto    | Organizar tareas, hacer seguimiento al avance, coordinar reuniones y ayudar a resolver desacuerdos.         |
+| **Brandon Eduardo Quintero Ayala** | Desarrollador / Responsable técnico | Desarrollo del sistema, base de datos, backend, lógica del sistema e integración de funcionalidades.        |
+| **Kevin Vuskovit Garcia Gonzalez** | Diseño / QA y documentación         | Diseño de interfaz, experiencia de usuario, pruebas del sistema, identificación de errores y documentación. |
+
 
 ¿Cómo toman decisiones?
 Las decisiones importantes se toman por consenso.
