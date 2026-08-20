@@ -18,7 +18,7 @@ Plataforma web de venta en línea (catálogo, carrito, checkout, inventario) con
 ## 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/<org>/shop-hub.git
+git clone https://github.com/<org>/shop-hub.git](https://github.com/Vuskogarcia/proyecto_pagina_web
 cd shop-hub
 ```
 
