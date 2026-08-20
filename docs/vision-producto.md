@@ -10,7 +10,9 @@ Revisión (19 ago 2026): el equipo identificó que el soporte postventa es el pr
 2. Usuarios y Actores Principales
    
 Cliente: Compra productos y puede abrir tickets de soporte relacionados con sus pedidos.
+
 Agente de Servicio al Cliente: Atiende la cola de tickets y responde las solicitudes de los clientes.
+
 Administrador: Gestiona el catálogo de productos y supervisa información general del sistema.
 
 3. Propuesta de Valor (Plantilla de Visión)
