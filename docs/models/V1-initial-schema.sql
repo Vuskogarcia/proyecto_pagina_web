@@ -1,6 +1,3 @@
--- =========================================================
--- Script de creación de base de datos (PostgreSQL) - 3FN
--- =========================================================
 
 CREATE TABLE cliente (
     id_cliente   SERIAL PRIMARY KEY,
@@ -66,7 +63,6 @@ CREATE TABLE asignacion (
     resultado      VARCHAR(100)
 );
 
--- Índices recomendados para llaves foráneas frecuentemente consultadas
 CREATE INDEX idx_carrito_cliente ON carrito(id_cliente);
 CREATE INDEX idx_pedido_cliente ON pedido(id_cliente);
 CREATE INDEX idx_ticket_cliente ON ticket_soporte(id_cliente);
