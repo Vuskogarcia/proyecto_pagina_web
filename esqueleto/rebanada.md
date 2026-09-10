@@ -66,3 +66,33 @@ actor Cliente
     deactivate ORM
     deactivate Vista
 ´´´´
+
+# Diagrama de clases.
+
+
+```
+classDiagram
+    class ProductoDetailView {
+        <<Vista - HTTP/UI + Aplicación>>
+        +get(request, id_producto)
+HttpResponse
+    }
+
+    class Producto {
+        <<Modelo - Dominio + Persistencia>>
+        +id_producto : int
+        +nombre : str
+        +precio_actual : decimal
+        +descripcion : str
+        +stock_disponible : int
+        +objects.get(id_producto)
+Producto
+    }
+
+    class DoesNotExist {
+        <<Excepción - Dominio>>
+    }
+
+    ProductoDetailView ..> Producto : consulta
+    Producto ..> DoesNotExist : lanza si no existe
+´´´
