@@ -31,15 +31,14 @@ La creación de ticket cruza la misma cantidad de fronteras, pero introduce más
 Además, el asunto exigido por las historias no está resuelto en el modelo de datos.
 Por eso tiene mayor riesgo de obligarnos a inventar o reconciliar decisiones antes de tener el esqueleto andando.
 
-# Diagrama de secuencia.
+#Diagrama de secuencia.
 
 ```mermaid
 sequenceDiagram
-actor Cliente
+    actor Cliente
     participant Vista as "Vista Django (HTTP/UI + Aplicación)"
     participant ORM as "ORM Django (Dominio / Mapeo)"
     participant DB as "PostgreSQL (Persistencia real)"
-
 
     Cliente->>Vista: GET /productos/{id_producto}
     activate Vista
@@ -65,17 +64,15 @@ actor Cliente
     deactivate DB
     deactivate ORM
     deactivate Vista
-´´´´
+```
 
 # Diagrama de clases.
-
 
 ```mermaid
 classDiagram
     class ProductoDetailView {
         <<Vista - HTTP/UI + Aplicación>>
-        +get(request, id_producto)
-HttpResponse
+        +get(request, id_producto) HttpResponse
     }
 
     class Producto {
@@ -85,8 +82,7 @@ HttpResponse
         +precio_actual : decimal
         +descripcion : str
         +stock_disponible : int
-        +objects.get(id_producto)
-Producto
+        +objects.get(id_producto) Producto
     }
 
     class DoesNotExist {
@@ -95,4 +91,4 @@ Producto
 
     ProductoDetailView ..> Producto : consulta
     Producto ..> DoesNotExist : lanza si no existe
-´´´
+```
