@@ -31,7 +31,7 @@ La creación de ticket cruza la misma cantidad de fronteras, pero introduce más
 Además, el asunto exigido por las historias no está resuelto en el modelo de datos.
 Por eso tiene mayor riesgo de obligarnos a inventar o reconciliar decisiones antes de tener el esqueleto andando.
 
-#Diagrama de secuencia.
+# Diagrama de secuencia.
 
 ```mermaid
 sequenceDiagram
