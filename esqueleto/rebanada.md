@@ -126,3 +126,28 @@ Frontera que puede romperse sin ser detectada: Migración — consecuencia direc
 | Ruta HTTP `/productos/{id_producto}` | — | **VACÍO** — ningún insumo define rutas ni contratos de API |
 | Uso de ORM Django | — | **VACÍO** — no lo prescribe ningún insumo; decisión del equipo tomada fuera de estos documentos |
 | `stock_disponible` para marcar "agotado" | `docs/Historia de usuario/historias.md` | Prioridad 2, criterio 4 — existe en el modelo, pero queda fuera de alcance de esta rebanada (no es vacío del diagrama) |
+
+
+
+
+# Vacios
+
+# Vacíos detectados
+
+Elementos que los insumos del proyecto (`vision-producto.md`, `historias.md`, `problema-duro.md`,
+`data-model.md`, `domain_model.md`) no definen, y que por regla de fidelidad no se inventaron.
+
+1. **No hay modelo de autenticación** — la Historia 1 exige registro/login con rol (cliente/agente/administrador), pero ninguna tabla tiene campos de contraseña ni de rol.
+2. **No existe el actor Administrador** en ningún modelo de datos — solo están `CLIENTE` y `AGENTE`.
+3. **Mecanismo de concurrencia sin decidir** — `problema-duro.md` propone 3 opciones (bloqueo optimista, pesimista, o `SELECT FOR UPDATE`/`SERIALIZABLE`) pero no elige ninguna, y ningún modelo tiene el campo de control correspondiente (ej. `version`).
+4. **Sin formato de identificador de negocio** — las historias piden `PED-00001` y `TCK-00001` (o UUID) para pedidos y tickets, pero los modelos solo tienen enteros autoincrementales.
+5. **Falta el campo `asunto`** en `TICKET_SOPORTE` — las historias 5 y 6 lo piden, pero el modelo solo tiene `descripcion`.
+6. **Inconsistencia entre modelos**: `data-model.md` no tiene `total` en `PEDIDO`, pero `domain_model.md` sí.
+7. **Otra inconsistencia**: la cardinalidad CLIENTE–CARRITO cambia entre los dos modelos (obligatoria vs. opcional), y el campo de `ASIGNACION` se llama distinto en cada uno (`fecha_hora` vs. `timestamp`).
+8. **Sin estados formalmente enumerados** — no se definen los valores válidos de `estado` (pedido/ticket), ni la regla de consistencia entre ambos que exige `vision-producto.md`.
+9. **Sin definición de API/rutas** — ningún insumo especifica endpoints, verbos HTTP, ni si es API separada o vistas renderizadas por Django.
+10. **Decisión pendiente sobre `managed=True/False`** en el modelo `Producto`, que afecta si la frontera de "Migración" se cruza de verdad en la rebanada elegida.
+
+---
+
+**Nota:** en el diagrama de secuencia (Tarea 2) no se presentó este problema, debido a que se escogió la Candidata A (consultar detalle de producto) en lugar de la Candidata B — la rebanada elegida no depende de ninguno de los vacíos anteriores para completarse de extremo a extremo.
