@@ -110,3 +110,19 @@ Estado esperado en la base de datos real: sin cambios — la fila en producto si
 Ruta de error: ejecutar GET /productos/{id_producto_inexistente} con un id que no exista, y verificar respuesta 404 (no 500 ni 200 con cuerpo vacío).
 
 Frontera que puede romperse sin ser detectada: Migración — consecuencia directa del vacío ya señalado (decisión pendiente managed=True/False).
+
+
+
+# Trazabilidad
+
+# Trazabilidad — Rebanada: Consultar detalle de producto
+
+| Elemento del diagrama | Archivo de origen | Línea o sección que lo respalda |
+|---|---|---|
+| Historia "consultar detalle de producto" | `docs/Historia de usuario/historias.md` | Prioridad 2, criterio 3: "El cliente puede consultar el detalle de un producto." |
+| Entidad `PRODUCTO` (`id_producto`, `nombre`, `precio_actual`, `descripcion`, `stock_disponible`) | `docs/models/data-model.md` | Bloque `PRODUCTO { ... }` |
+| Tabla real `producto` en PostgreSQL | Script SQL ejecutado por el equipo (verificado en pgAdmin) | `CREATE TABLE producto (...)` |
+| Ruta de error "producto no existe" → 404 | — | **VACÍO** — ningún insumo define este comportamiento; se usó como ruta mínima exigida por el enunciado de la Tarea 2 |
+| Ruta HTTP `/productos/{id_producto}` | — | **VACÍO** — ningún insumo define rutas ni contratos de API |
+| Uso de ORM Django | — | **VACÍO** — no lo prescribe ningún insumo; decisión del equipo tomada fuera de estos documentos |
+| `stock_disponible` para marcar "agotado" | `docs/Historia de usuario/historias.md` | Prioridad 2, criterio 4 — existe en el modelo, pero queda fuera de alcance de esta rebanada (no es vacío del diagrama) |
