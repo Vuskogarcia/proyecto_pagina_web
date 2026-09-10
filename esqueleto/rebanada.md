@@ -33,7 +33,7 @@ Por eso tiene mayor riesgo de obligarnos a inventar o reconciliar decisiones ant
 
 # Diagrama de secuencia.
 
-```
+```mermaid
 sequenceDiagram
 actor Cliente
     participant Vista as "Vista Django (HTTP/UI + Aplicación)"
@@ -70,7 +70,7 @@ actor Cliente
 # Diagrama de clases.
 
 
-```
+```mermaid
 classDiagram
     class ProductoDetailView {
         <<Vista - HTTP/UI + Aplicación>>
