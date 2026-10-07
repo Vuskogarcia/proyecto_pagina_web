@@ -48,3 +48,37 @@ class ConcurrenciaTicketsTests(TransactionTestCase):
         self.ticket.refresh_from_db()
         self.assertEqual(self.ticket.estado, "asignado")
         self.assertEqual(RegistroAsignacion.objects.filter(ticket=self.ticket).count(), 1)
+
+
+
+from django.test import TestCase, Client
+import json
+from .models import TicketSoporte
+
+class EsqueletoAndanteE2ETest(TestCase):
+    def test_crear_ticket_endpoint_e2e(self):
+        # 1. Simular un cliente HTTP
+        client = Client()
+        
+        # Payload de acuerdo a tu modelo E-R (sin campos inventados como 'asunto')
+        payload = {
+            "id_cliente": 1,
+            "id_pedido": None,
+            "descripcion": "Problema con mi pedido, no llegó el paquete"
+        }
+        
+        # 2. Atravesar la frontera: Petición HTTP POST al endpoint
+        response = client.post(
+            '/api/tickets/', 
+            data=json.dumps(payload), 
+            content_type='application/json'
+        )
+        
+        # 3. Verificar respuesta de la API
+        self.assertEqual(response.status_code, 201)
+        
+        # 4. Verificar frontera final: persistencia en PostgreSQL
+        self.assertEqual(TicketSoporte.objects.count(), 1)
+        ticket_bd = TicketSoporte.objects.first()
+        self.assertEqual(ticket_bd.descripcion, "Problema con mi pedido, no llegó el paquete")
+        self.assertEqual(ticket_bd.estado, "ABIERTO")
