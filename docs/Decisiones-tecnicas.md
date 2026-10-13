@@ -2,11 +2,11 @@
 | --------------------------------- | ------------------------------ | --------- | ------------------------------------- |
 | Definir requisitos del sistema    | Esteban Pinilla Vela           | Pendiente | Documento de requisitos               |
 | Configurar repositorio Git/GitHub | Esteban Pinilla Vela           | Pendiente | Repositorio GitHub                    |
-| Diseñar arquitectura del sistema  | Brandon Eduardo Quintero Ayala | Pendiente | Diagrama de arquitectura              |
-| Diseñar base de datos             | Brandon Eduardo Quintero Ayala | Pendiente | Modelo ER / scripts SQL               |
-| Implementar catálogo de productos | Brandon Eduardo Quintero Ayala | Pendiente | Código fuente                         |
-| Implementar carrito y checkout    | Brandon Eduardo Quintero Ayala | Pendiente | Código fuente                         |
-| Implementar módulo de tickets     | Brandon Eduardo Quintero Ayala | Pendiente | Código fuente                         |
+| Diseñar arquitectura del sistema  | Esteban Pinilla Vela           | Pendiente | Diagrama de arquitectura              |
+| Diseñar base de datos             | Esteban Pinilla Vela           | Pendiente | Modelo ER / scripts SQL               |
+| Implementar catálogo de productos | Kevin Vuskovit Garcia Gonzalez | Pendiente | Código fuente                         |
+| Implementar carrito y checkout    | Kevin Vuskovit Garcia Gonzalez | Pendiente | Código fuente                         |
+| Implementar módulo de tickets     | Kevin Vuskovit Garcia Gonzalez | Pendiente | Código fuente                         |
 | Diseñar interfaz de la tienda     | Kevin Vuskovit Garcia Gonzalez | Pendiente | Diseños / código frontend             |
 | Diseñar experiencia de usuario    | Kevin Vuskovit Garcia Gonzalez | Pendiente | Prototipos / diseños                  |
 | Diseñar pruebas del sistema       | Kevin Vuskovit Garcia Gonzalez | Pendiente | Plan de pruebas                       |
