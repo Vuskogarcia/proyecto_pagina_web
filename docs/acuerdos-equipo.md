@@ -2,16 +2,15 @@ Roles del equipo
 
 | Integrante                         | Rol                                 | Responsabilidades principales                                                                               |
 | ---------------------------------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| **Esteban Pinilla Vela**           | Líder / Coordinador del proyecto    | Organizar tareas, hacer seguimiento al avance, coordinar reuniones y ayudar a resolver desacuerdos.         |
-| **Brandon Eduardo Quintero Ayala** | Desarrollador / Responsable técnico | Desarrollo del sistema, base de datos, backend, lógica del sistema e integración de funcionalidades.        |
-| **Kevin Vuskovit Garcia Gonzalez** | Diseño / QA y documentación         | Diseño de interfaz, experiencia de usuario, pruebas del sistema, identificación de errores y documentación. |
+| **Esteban Pinilla Vela**           | Líder / Responsable técnico         | Organizar tareas, seguimiento al avance, coordinar reuniones, arquitectura del sistema y base de datos.     |
+| **Kevin Vuskovit Garcia Gonzalez** | Desarrollo / QA y documentación     | Implementación de catálogo, carrito y tickets, diseño de interfaz, pruebas, errores y documentación.        |
 
 
 ¿Cómo toman decisiones?
 Las decisiones importantes se toman por consenso.
 Cada integrante tiene un voto.
-Si no se llega a un acuerdo, se toma la decisión por mayoría (2 de 3).
-Las decisiones relacionadas con aspectos técnicos serán discutidas por todo el equipo, teniendo en cuenta especialmente la opinión del responsable técnico.
+Si no se llega a un acuerdo, decide el responsable del área: las decisiones técnicas (arquitectura y base de datos) las toma Esteban; las de implementación, diseño, pruebas y documentación, Kevin.
+Las decisiones relacionadas con aspectos técnicos serán discutidas por todo el equipo, teniendo en cuenta especialmente la opinión del responsable del área.
 Las decisiones se registrarán en el documento o herramienta que utilicen para gestionar el proyecto.
 
 ¿Qué pasa si alguien no participa?
@@ -24,17 +23,15 @@ Acuerdos de equipo y política de IA
 
 1. Roles del equipo
 
-Líder / Coordinador del proyecto: encargado de organizar las actividades, realizar seguimiento al cumplimiento de las tareas, coordinar las reuniones y facilitar la comunicación entre los integrantes.
+Líder / Coordinador y responsable técnico (Esteban Pinilla Vela): encargado de organizar las actividades, realizar seguimiento al cumplimiento de las tareas, coordinar las reuniones y facilitar la comunicación entre los integrantes. Además, es responsable del diseño de la arquitectura del sistema y de la base de datos.
 
-Responsable técnico / Desarrollador: encargado principalmente del desarrollo del sistema, la implementación de la lógica de negocio, la base de datos, el backend y la integración de las diferentes funcionalidades.
-
-Responsable de diseño, pruebas y documentación: encargado principalmente del diseño de la interfaz y experiencia de usuario, la realización de pruebas, identificación de errores y elaboración de la documentación del proyecto.
+Desarrollador y responsable de pruebas y documentación (Kevin Vuskovit Garcia Gonzalez): encargado de la implementación de la lógica de negocio y del backend (catálogo, carrito y tickets), la integración de las funcionalidades, el diseño de la interfaz y la experiencia de usuario, las pruebas, la identificación de errores y la documentación del proyecto.
 
 2. Toma de decisiones
    
-Las decisiones importantes del proyecto serán discutidas entre los tres integrantes y se buscará llegar a un consenso. Cada integrante tendrá derecho a expresar su opinión y participar en la toma de decisiones.
-Cuando no sea posible llegar a un acuerdo, la decisión se tomará por mayoría simple, es decir, con el voto favorable de al menos dos de los tres integrantes.
-Las decisiones relacionadas con aspectos técnicos serán analizadas por todo el equipo, teniendo en cuenta la experiencia y responsabilidad del integrante encargado del área técnica.
+Las decisiones importantes del proyecto serán discutidas entre los dos integrantes y se buscará llegar a un consenso. Cada integrante tendrá derecho a expresar su opinión y participar en la toma de decisiones.
+Cuando no sea posible llegar a un acuerdo, la decisión la tomará el responsable del área correspondiente: Esteban en arquitectura y base de datos; Kevin en implementación, diseño, pruebas y documentación. La decisión y su motivo quedarán registrados.
+Las decisiones relacionadas con aspectos técnicos serán analizadas por todo el equipo, teniendo en cuenta la experiencia y responsabilidad del integrante encargado de esa área.
 
 3. Participación y cumplimiento de tareas
    
