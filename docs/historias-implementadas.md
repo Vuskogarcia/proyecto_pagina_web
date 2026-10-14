@@ -11,7 +11,7 @@ Correr todas las pruebas (desde la carpeta `tests/`):
 python manage.py test
 ```
 
-Resultado esperado: **27 pruebas en verde.**
+Resultado esperado: **29 pruebas en verde** (27 de historias de usuario y 2 del comando `cargar_datos_demo`).
 
 | HU | Historia | Endpoint | Archivo de pruebas | Pruebas |
 | --- | --- | --- | --- | --- |
