@@ -138,7 +138,19 @@ python manage.py createsuperuser
 > Si `activate` da un error de permisos en PowerShell, corre una vez:
 > `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`
 
-### 4.3 Arrancar el servidor
+### 4.3 Cargar datos de ejemplo
+
+```bash
+python manage.py cargar_datos_demo
+```
+
+Llena las tablas de Django con los mismos datos de `database/02_seed.sql`: 5 productos (uno agotado), 3 clientes (`ana`, `luis`, `maria`), 2 agentes (`carlos`, `diana`), 3 pedidos y 3 tickets (uno abierto, uno en proceso y uno cerrado). La clave de todos los usuarios de ejemplo es `demo12345`.
+
+Si ya hay datos, no hace nada. Para borrarlos y cargarlos de nuevo: `python manage.py cargar_datos_demo --reset`.
+
+> Las tablas que crean los scripts de `database/` (`producto`, `pedido`, `cliente`…) **no son las que usa Django**. Django usa las suyas, con el nombre de la app adelante: `catalogo_producto`, `carrito_pedido`, `soporte_ticketsoporte`, `auth_user`.
+
+### 4.4 Arrancar el servidor
 
 ```bash
 python manage.py runserver
@@ -147,33 +159,33 @@ python manage.py runserver
 - API: `http://127.0.0.1:8000/api/`
 - Panel de administración: `http://127.0.0.1:8000/admin/`
 
-### 4.4 Probar que responde
+### 4.5 Probar que responde
 
-Primero crea un producto en `/admin/` (Productos → Añadir). Después, en **Git Bash**:
+Con los datos de ejemplo cargados (paso 4.3), en **Git Bash**:
 
 ```bash
 # HU-02: ver el catálogo
 curl -s localhost:8000/api/productos/
 
-# HU-04: comprar 2 unidades del producto 1 (cliente 1 = el superusuario)
-curl -s -X POST localhost:8000/api/pedidos/ -H 'Content-Type: application/json' \
-  -d '{"id_cliente": 1, "items": [{"id_producto": 1, "cantidad": 2}]}'
-
-# HU-05: crear un ticket sobre ese pedido
-curl -s -X POST localhost:8000/api/tickets/ -H 'Content-Type: application/json' \
-  -d '{"id_cliente": 1, "id_pedido": 1, "asunto": "Paquete", "descripcion": "No llegó"}'
-
-# HU-07: ver la cola de tickets sin asignar
+# HU-07: ver la cola de tickets sin asignar (el id del ticket abierto sale aquí)
 curl -s localhost:8000/api/tickets/cola/
 
-# HU-08: el agente 1 toma el ticket 1 (repítelo: la segunda vez responde 409)
+# HU-04: comprar; usa ids de /api/productos/ y de un cliente (ver /admin/ → Usuarios)
+curl -s -X POST localhost:8000/api/pedidos/ -H 'Content-Type: application/json' \
+  -d '{"id_cliente": 2, "items": [{"id_producto": 1, "cantidad": 2}]}'
+
+# HU-05: crear un ticket sobre un pedido de ese mismo cliente
+curl -s -X POST localhost:8000/api/tickets/ -H 'Content-Type: application/json' \
+  -d '{"id_cliente": 2, "id_pedido": 1, "asunto": "Paquete", "descripcion": "No llegó"}'
+
+# HU-08: un agente toma un ticket (repítelo: la segunda vez responde 409)
 curl -s -X POST localhost:8000/api/tickets/1/tomar/ -H 'Content-Type: application/json' \
-  -d '{"id_agente": 1}'
+  -d '{"id_agente": 5}'
 ```
 
 En Windows usa **Git Bash** para que `curl` y las comillas se comporten igual.
 
-### 4.5 Endpoints
+### 4.6 Endpoints
 
 | Método | Ruta | Historia | Respuestas |
 | --- | --- | --- | --- |
@@ -201,7 +213,8 @@ Cada módulo tiene una carpeta `pruebas/` con **un archivo por historia de usuar
 | `soporte/pruebas/test_hu05_crear_ticket.py` | HU-05 Crear ticket | 7 |
 | `soporte/pruebas/test_hu07_cola_sin_asignar.py` | HU-07 Cola sin asignar | 3 |
 | `soporte/pruebas/test_hu08_tomar_ticket.py` | HU-08 Tomar ticket (concurrencia) | 5 |
-| | | **27** |
+| `catalogo/pruebas/test_datos_demo.py` | comando `cargar_datos_demo` | 2 |
+| | | **29** |
 
 `comun/fabricas.py` **no tiene pruebas**: es una fábrica de datos de prueba que crea clientes, productos, pedidos y tickets ya listos, para no repetir las mismas líneas en cada test.
 
@@ -248,6 +261,7 @@ def test_criterio2_un_ticket_ya_tomado_responde_409(self):
 | `python manage.py makemigrations` | genera migraciones después de cambiar un `models.py` |
 | `python manage.py migrate` | aplica las migraciones a la base de datos |
 | `python manage.py createsuperuser` | crea un usuario para `/admin/` |
+| `python manage.py cargar_datos_demo` | carga datos de ejemplo (`--reset` para recargarlos) |
 | `git log --oneline --graph` | la historia del proyecto en una pantalla |
 
 ---
