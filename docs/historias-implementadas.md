@@ -11,15 +11,15 @@ Correr todas las pruebas (desde la carpeta `tests/`):
 python manage.py test
 ```
 
-Resultado esperado: **29 pruebas en verde** (27 de historias de usuario y 2 del comando `cargar_datos_demo`).
+Resultado esperado: **17 pruebas en verde** (3 por cada historia de usuario y 2 del comando `cargar_datos_demo`).
 
 | HU | Historia | Endpoint | Archivo de pruebas | Pruebas |
 | --- | --- | --- | --- | --- |
-| HU-02 | Consultar catálogo | `GET /api/productos/` · `GET /api/productos/<id>/` | `catalogo/pruebas/test_hu02_consultar_catalogo.py` | 5 |
-| HU-04 | Checkout | `POST /api/pedidos/` · `GET /api/pedidos/<id>/` | `carrito/pruebas/test_hu04_checkout.py` | 7 |
-| HU-05 | Crear ticket asociado a un pedido | `POST /api/tickets/` | `soporte/pruebas/test_hu05_crear_ticket.py` | 7 |
+| HU-02 | Consultar catálogo | `GET /api/productos/` · `GET /api/productos/<id>/` | `catalogo/pruebas/test_hu02_consultar_catalogo.py` | 3 |
+| HU-04 | Checkout | `POST /api/pedidos/` · `GET /api/pedidos/<id>/` | `carrito/pruebas/test_hu04_checkout.py` | 3 |
+| HU-05 | Crear ticket asociado a un pedido | `POST /api/tickets/` | `soporte/pruebas/test_hu05_crear_ticket.py` | 3 |
 | HU-07 | Cola de tickets sin asignar | `GET /api/tickets/cola/` | `soporte/pruebas/test_hu07_cola_sin_asignar.py` | 3 |
-| HU-08 | Tomar ticket con control de concurrencia | `POST /api/tickets/<id>/tomar/` | `soporte/pruebas/test_hu08_tomar_ticket.py` | 5 |
+| HU-08 | Tomar ticket con control de concurrencia | `POST /api/tickets/<id>/tomar/` | `soporte/pruebas/test_hu08_tomar_ticket.py` | 3 |
 
 ---
 
@@ -30,9 +30,8 @@ Resultado esperado: **29 pruebas en verde** (27 de historias de usuario y 2 del 
 
 | Criterio | Prueba que lo verifica |
 | --- | --- |
-| 1. El sistema muestra los productos disponibles (los retirados no aparecen). | `test_criterio1_muestra_solo_productos_activos` |
-| 2. Cada producto muestra nombre, precio y descripción. | `test_criterio2_cada_producto_muestra_nombre_precio_y_descripcion` |
-| 3. Se puede consultar el detalle de un producto (404 si no existe). | `test_criterio3_consultar_detalle_de_un_producto` · `test_criterio3_detalle_de_producto_inexistente_o_retirado_da_404` |
+| 1 y 2. El sistema muestra los productos disponibles (los retirados no aparecen), cada uno con nombre, precio y descripción. | `test_criterio1y2_muestra_solo_productos_activos_con_nombre_precio_y_descripcion` |
+| 3. Se puede consultar el detalle de un producto (404 si no existe o fue retirado). | `test_criterio3_consultar_detalle_de_un_producto` |
 | 4. Los productos sin disponibilidad se identifican como agotados. | `test_criterio4_producto_sin_stock_se_identifica_como_agotado` |
 
 ```bash
@@ -46,11 +45,9 @@ python manage.py test catalogo
 
 | Criterio | Prueba que lo verifica |
 | --- | --- |
-| 2. El sistema calcula correctamente el total. | `test_criterio2_calcula_correctamente_el_total` |
-| 3. Los datos del pedido se validan (400 si están incompletos o mal formados). | `test_criterio3_datos_incompletos_o_invalidos_dan_400` |
-| 4. Se genera un pedido con identificador único `PED-00001`. | `test_criterio4_genera_pedido_con_identificador_unico` |
-| Regla: el checkout descuenta el stock. | `test_el_checkout_descuenta_el_stock` |
-| Regla: sin stock suficiente no se crea el pedido ni se descuenta nada (409). | `test_sin_stock_suficiente_no_se_crea_el_pedido_ni_se_descuenta_nada` |
+| 2. El sistema calcula correctamente el total (y el checkout descuenta el stock). | `test_criterio2_calcula_el_total_y_descuenta_el_stock` |
+| 3. Los datos del pedido se validan: 400 si están incompletos o mal formados, 404 si el producto o el cliente no existe, 409 sin stock suficiente (no se crea el pedido ni se descuenta nada). | `test_criterio3_datos_invalidos_o_sin_stock_no_crean_el_pedido` |
+| 4. Se genera un pedido con identificador único `PED-00001` que se puede consultar. | `test_criterio4_genera_pedido_con_identificador_unico` |
 
 > Pendiente del criterio 1 (agregar y quitar del carrito antes de pagar): hoy
 > el checkout recibe la lista de productos en una sola petición.
@@ -66,11 +63,9 @@ python manage.py test carrito
 
 | Criterio | Prueba que lo verifica |
 | --- | --- |
-| 1 y 4. El ticket queda asociado al pedido que el cliente seleccionó. | `test_criterio1y4_el_ticket_queda_asociado_al_pedido_seleccionado` |
-| 2. Se registran asunto y descripción. | `test_criterio2_guarda_asunto_y_descripcion` |
+| 1, 2 y 4. El ticket queda asociado al pedido seleccionado y guarda asunto y descripción (prueba de punta a punta HTTP → BD). | `test_crear_ticket_endpoint_e2e` |
 | 3. Se genera un número único de ticket `TCK-00001`. | `test_criterio3_genera_un_numero_unico_de_ticket` |
-| Regla: un cliente no puede asociar el pedido de otro cliente. | `test_no_se_puede_asociar_un_pedido_de_otro_cliente` |
-| Prueba de punta a punta (HTTP → BD). | `test_crear_ticket_endpoint_e2e` |
+| Regla: no se crea el ticket con el pedido de otro cliente, sin descripción (400) o con cliente o pedido inexistente (404). | `test_datos_invalidos_o_pedido_ajeno_no_crean_el_ticket` |
 
 ## HU-07 · Cola de tickets sin asignar
 
@@ -90,10 +85,9 @@ python manage.py test carrito
 
 | Criterio | Prueba que lo verifica |
 | --- | --- |
-| 1. El ticket queda asignado solo al agente que lo pidió. | `test_criterio1_el_ticket_queda_asignado_al_agente_que_lo_pidio` |
-| 2. Si ya fue tomado, el otro agente recibe un mensaje claro (409). | `test_criterio2_un_ticket_ya_tomado_responde_409` |
+| 1 y 4. El ticket queda asignado solo al agente que lo pidió y la asignación queda registrada (agente, ticket, fecha). | `test_criterio1y4_el_ticket_queda_asignado_y_registrado` |
+| 2. Si ya fue tomado, el otro agente recibe un mensaje claro (409) y el intento no deja registro. | `test_criterio2_un_ticket_ya_tomado_responde_409` |
 | 3. Prueba automatizada de asignación concurrente con dos hilos. | `test_criterio3_dos_agentes_compiten_y_solo_uno_obtiene_el_ticket` |
-| 4. Cada asignación exitosa queda registrada (agente, ticket, fecha). | `test_criterio4_cada_asignacion_exitosa_queda_registrada` |
 
 ```bash
 python manage.py test soporte

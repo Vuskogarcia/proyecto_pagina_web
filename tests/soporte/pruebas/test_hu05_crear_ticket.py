@@ -26,28 +26,23 @@ class HU05CrearTicketTests(TestCase):
         )
 
     def test_crear_ticket_endpoint_e2e(self):
+        # Criterios 1, 2 y 4: el ticket guarda asunto, descripción y el pedido elegido.
         # EJECUTAR: atravesar la frontera HTTP con un POST real al endpoint.
-        respuesta = self.crear(id_pedido=None, descripcion="Problema con mi pedido, no llegó el paquete")
+        respuesta = self.crear(
+            id_pedido=self.pedido.pk,
+            asunto="Paquete perdido",
+            descripcion="Problema con mi pedido, no llegó el paquete",
+        )
 
         # VERIFICAR: respuesta de la API y persistencia en la base de datos.
         self.assertEqual(respuesta.status_code, 201)
+        self.assertEqual(respuesta.json()["id_pedido"], self.pedido.pk)
+        self.assertEqual(respuesta.json()["pedido"], self.pedido.codigo)
+        self.assertEqual(respuesta.json()["asunto"], "Paquete perdido")
         self.assertEqual(TicketSoporte.objects.count(), 1)
         ticket_bd = TicketSoporte.objects.first()
         self.assertEqual(ticket_bd.descripcion, "Problema con mi pedido, no llegó el paquete")
         self.assertEqual(ticket_bd.estado, "ABIERTO")
-
-    def test_criterio1y4_el_ticket_queda_asociado_al_pedido_seleccionado(self):
-        respuesta = self.crear(id_pedido=self.pedido.pk)
-
-        self.assertEqual(respuesta.status_code, 201)
-        self.assertEqual(respuesta.json()["id_pedido"], self.pedido.pk)
-        self.assertEqual(respuesta.json()["pedido"], self.pedido.codigo)
-
-    def test_criterio2_guarda_asunto_y_descripcion(self):
-        respuesta = self.crear(asunto="Paquete perdido", descripcion="Pasaron 10 días")
-
-        self.assertEqual(respuesta.json()["asunto"], "Paquete perdido")
-        self.assertEqual(respuesta.json()["descripcion"], "Pasaron 10 días")
 
     def test_criterio3_genera_un_numero_unico_de_ticket(self):
         primero = self.crear().json()
@@ -56,15 +51,11 @@ class HU05CrearTicketTests(TestCase):
         self.assertRegex(primero["numero"], r"^TCK-\d{5}$")
         self.assertNotEqual(primero["numero"], segundo["numero"])
 
-    def test_no_se_puede_asociar_un_pedido_de_otro_cliente(self):
-        respuesta = self.crear(id_pedido=self.pedido_ajeno.pk)
-
-        self.assertEqual(respuesta.status_code, 400)
-        self.assertEqual(TicketSoporte.objects.count(), 0)
-
-    def test_sin_descripcion_da_400(self):
+    def test_datos_invalidos_o_pedido_ajeno_no_crean_el_ticket(self):
+        # Un cliente no puede asociar el pedido de otro cliente.
+        self.assertEqual(self.crear(id_pedido=self.pedido_ajeno.pk).status_code, 400)
         self.assertEqual(self.crear(descripcion="   ").status_code, 400)
-
-    def test_cliente_o_pedido_inexistente_da_404(self):
         self.assertEqual(self.crear(id_cliente=9999).status_code, 404)
         self.assertEqual(self.crear(id_pedido=9999).status_code, 404)
+
+        self.assertEqual(TicketSoporte.objects.count(), 0)

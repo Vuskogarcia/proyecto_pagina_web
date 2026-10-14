@@ -13,18 +13,15 @@ class HU02ConsultarCatalogoTests(TestCase):
         self.mouse = fabricas.producto("Mouse inalámbrico", "60000", stock=0)
         self.retirado = fabricas.producto("Monitor viejo", "300000", stock=5, activo=False)
 
-    def test_criterio1_muestra_solo_productos_activos(self):
+    def test_criterio1y2_muestra_solo_productos_activos_con_nombre_precio_y_descripcion(self):
         respuesta = self.client.get("/api/productos/")
 
         self.assertEqual(respuesta.status_code, 200)
-        nombres = [p["nombre"] for p in respuesta.json()["productos"]]
+        productos = respuesta.json()["productos"]
+        nombres = [p["nombre"] for p in productos]
         self.assertEqual(nombres, ["Mouse inalámbrico", "Teclado mecánico"])
         self.assertNotIn("Monitor viejo", nombres)
-
-    def test_criterio2_cada_producto_muestra_nombre_precio_y_descripcion(self):
-        respuesta = self.client.get("/api/productos/")
-
-        for producto in respuesta.json()["productos"]:
+        for producto in productos:
             self.assertTrue(producto["nombre"])
             self.assertTrue(producto["precio"])
             self.assertIn("descripcion", producto)
@@ -35,8 +32,7 @@ class HU02ConsultarCatalogoTests(TestCase):
         self.assertEqual(respuesta.status_code, 200)
         self.assertEqual(respuesta.json()["nombre"], "Teclado mecánico")
         self.assertEqual(respuesta.json()["precio"], "150000.00")
-
-    def test_criterio3_detalle_de_producto_inexistente_o_retirado_da_404(self):
+        # Un producto inexistente o retirado no tiene detalle.
         self.assertEqual(self.client.get("/api/productos/9999/").status_code, 404)
         self.assertEqual(
             self.client.get(f"/api/productos/{self.retirado.pk}/").status_code, 404

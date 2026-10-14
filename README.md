@@ -208,13 +208,13 @@ Cada módulo tiene una carpeta `pruebas/` con **un archivo por historia de usuar
 
 | Archivo de prueba | Historia | Cuántas |
 | --- | --- | --- |
-| `catalogo/pruebas/test_hu02_consultar_catalogo.py` | HU-02 Consultar catálogo | 5 |
-| `carrito/pruebas/test_hu04_checkout.py` | HU-04 Checkout | 7 |
-| `soporte/pruebas/test_hu05_crear_ticket.py` | HU-05 Crear ticket | 7 |
+| `catalogo/pruebas/test_hu02_consultar_catalogo.py` | HU-02 Consultar catálogo | 3 |
+| `carrito/pruebas/test_hu04_checkout.py` | HU-04 Checkout | 3 |
+| `soporte/pruebas/test_hu05_crear_ticket.py` | HU-05 Crear ticket | 3 |
 | `soporte/pruebas/test_hu07_cola_sin_asignar.py` | HU-07 Cola sin asignar | 3 |
-| `soporte/pruebas/test_hu08_tomar_ticket.py` | HU-08 Tomar ticket (concurrencia) | 5 |
+| `soporte/pruebas/test_hu08_tomar_ticket.py` | HU-08 Tomar ticket (concurrencia) | 3 |
 | `catalogo/pruebas/test_datos_demo.py` | comando `cargar_datos_demo` | 2 |
-| | | **29** |
+| | | **17** |
 
 `comun/fabricas.py` **no tiene pruebas**: es una fábrica de datos de prueba que crea clientes, productos, pedidos y tickets ya listos, para no repetir las mismas líneas en cada test.
 
