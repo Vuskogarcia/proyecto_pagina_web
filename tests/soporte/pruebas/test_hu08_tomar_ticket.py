@@ -30,12 +30,15 @@ class HU08TomarTicketTests(TestCase):
             content_type="application/json",
         )
 
-    def test_criterio1_el_ticket_queda_asignado_al_agente_que_lo_pidio(self):
+    def test_criterio1y4_el_ticket_queda_asignado_y_registrado(self):
         respuesta = self.tomar(self.agente1)
 
         self.assertEqual(respuesta.status_code, 200)
         self.assertEqual(respuesta.json()["agente"], "agente1")
         self.assertEqual(respuesta.json()["estado"], "EN_PROCESO")
+        registro = RegistroAsignacion.objects.get(ticket=self.ticket)
+        self.assertEqual(registro.agente, self.agente1)
+        self.assertIsNotNone(registro.asignado_en)
 
     def test_criterio2_un_ticket_ya_tomado_responde_409(self):
         self.tomar(self.agente1)
@@ -46,17 +49,9 @@ class HU08TomarTicketTests(TestCase):
         self.assertEqual(respuesta.json()["error"], "El ticket ya fue asignado")
         self.ticket.refresh_from_db()
         self.assertEqual(self.ticket.agente, self.agente1)
-
-    def test_criterio4_cada_asignacion_exitosa_queda_registrada(self):
-        self.tomar(self.agente1)
-        self.tomar(self.agente2)  # rechazada: no debe dejar registro
-
-        registros = RegistroAsignacion.objects.filter(ticket=self.ticket)
-        self.assertEqual(registros.count(), 1)
-        self.assertEqual(registros.first().agente, self.agente1)
-        self.assertIsNotNone(registros.first().asignado_en)
-
-    def test_ticket_inexistente_da_404(self):
+        # El intento rechazado no deja registro de asignación.
+        self.assertEqual(RegistroAsignacion.objects.filter(ticket=self.ticket).count(), 1)
+        # Un ticket que no existe tampoco se puede tomar.
         self.assertEqual(self.tomar(self.agente1, ticket_id=9999).status_code, 404)
 
 
