@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.conf import settings
 from django.db import models
 
@@ -34,7 +36,7 @@ class Pedido(models.Model):
         return f"PED-{self.pk:05d}"
 
     def total(self):
-        return sum((item.subtotal() for item in self.items.all()), start=0)
+        return sum((item.subtotal() for item in self.items.all()), start=Decimal("0"))
 
 
 class ItemPedido(models.Model):

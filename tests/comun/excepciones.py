@@ -1,4 +1,4 @@
-"""Los tres tipos de error del sistema.
+"""Los tipos de error del sistema.
 
 Cada excepción lleva el código HTTP que le corresponde. Los servicios las
 lanzan cuando una regla de negocio no se cumple, y el decorador `api`
@@ -28,3 +28,10 @@ class DatosInvalidos(ErrorDeNegocio):
     """Lo que llegó en la petición está mal formado o incompleto."""
 
     status = 400
+
+
+class SinPermiso(ErrorDeNegocio):
+    """El usuario existe pero su rol no le permite la operación (ej. un cliente
+    intentando tomar un ticket, que es tarea de un agente)."""
+
+    status = 403

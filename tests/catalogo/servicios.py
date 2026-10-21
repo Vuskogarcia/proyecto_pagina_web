@@ -16,14 +16,3 @@ def detalle_producto(producto_id):
         return Producto.objects.get(pk=producto_id, activo=True)
     except Producto.DoesNotExist:
         raise NoEncontrado(f"El producto {producto_id} no existe")
-
-
-def a_dict(producto):
-    return {
-        "id": producto.pk,
-        "nombre": producto.nombre,
-        "descripcion": producto.descripcion,
-        "precio": str(producto.precio),
-        "stock": producto.stock,
-        "agotado": producto.agotado,
-    }

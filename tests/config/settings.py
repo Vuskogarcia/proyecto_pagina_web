@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Carga variables desde esqueleto/.env si existe.
+# Carga variables desde tests/.env si existe.
 load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = os.getenv(

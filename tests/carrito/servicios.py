@@ -5,7 +5,7 @@ from django.db import transaction
 
 from catalogo.models import Producto
 from comun.excepciones import DatosInvalidos, EstadoInvalido, NoEncontrado
-from comun.http import entero
+from comun.validaciones import entero
 
 from .models import ItemPedido, Pedido
 
@@ -70,24 +70,3 @@ def detalle_pedido(pedido_id):
         return Pedido.objects.prefetch_related("items__producto").get(pk=pedido_id)
     except Pedido.DoesNotExist:
         raise NoEncontrado(f"El pedido {pedido_id} no existe")
-
-
-def a_dict(pedido):
-    return {
-        "id": pedido.pk,
-        "codigo": pedido.codigo,
-        "id_cliente": pedido.cliente_id,
-        "estado": pedido.estado,
-        "fecha": pedido.creado_en.isoformat(),
-        "total": str(pedido.total()),
-        "items": [
-            {
-                "id_producto": item.producto_id,
-                "producto": item.producto.nombre,
-                "cantidad": item.cantidad,
-                "precio": str(item.precio_pactado),
-                "subtotal": str(item.subtotal()),
-            }
-            for item in pedido.items.all()
-        ],
-    }

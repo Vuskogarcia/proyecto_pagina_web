@@ -43,7 +43,7 @@ proyecto_pagina_web/
     ├── catalogo/                    módulo: productos e inventario
     ├── carrito/                     módulo: checkout y pedidos
     ├── soporte/                     módulo: tickets y asignación a agentes
-    └── comun/                       los tres tipos de error y utilidades compartidas
+    └── comun/                       los tipos de error, validaciones y utilidades compartidas
 ```
 
 ### 2.1 Los módulos de dominio
@@ -56,11 +56,12 @@ Cada módulo repite los mismos papeles:
 | --- | --- | --- |
 | `models.py` | **Entidad** | los datos que se guardan; cada objeto es una fila |
 | `servicios.py` | **Servicio** | **las reglas del negocio** |
+| `serializadores.py` | Presentación | convierte las entidades en diccionarios para el JSON |
 | `views.py` | **Controlador** | la puerta HTTP: recibe la petición y llama al servicio |
 | `urls.py` | Rutas | qué URL llega a qué vista |
 | `admin.py` | Panel | cómo se ve el módulo en `/admin/` |
 | `migrations/` | Migraciones | los cambios de la base de datos, generados por Django |
-| `pruebas/` | **Pruebas** | un archivo por historia de usuario |
+| `pruebas/` | **Pruebas** | un archivo por historia de usuario, más pruebas unitarias y de casos borde |
 
 | Módulo | Entidades | Reglas principales (`servicios.py`) |
 | --- | --- | --- |
@@ -68,15 +69,16 @@ Cada módulo repite los mismos papeles:
 | `carrito/` | `Pedido`, `ItemPedido` | `realizar_checkout`, `detalle_pedido` |
 | `soporte/` | `TicketSoporte`, `RegistroAsignacion` | `crear_ticket`, `cola_sin_asignar`, `tomar_ticket` |
 
-### 2.2 `comun/`: los tres errores del sistema
+### 2.2 `comun/`: los errores del sistema
 
 | Excepción | Responde | Cuándo |
 | --- | --- | --- |
 | `NoEncontrado` | 404 | el id no existe |
 | `EstadoInvalido` | 409 | la operación no cabe en el estado actual (ej. ticket ya asignado, sin stock) |
 | `DatosInvalidos` | 400 | lo que llegó está mal formado o incompleto |
+| `SinPermiso` | 403 | el usuario existe pero su rol no le permite la operación (ej. un cliente tomando un ticket) |
 
-Los servicios lanzan estas excepciones y el decorador `@api` (`comun/http.py`) las convierte en una respuesta JSON con su código HTTP.
+Los servicios lanzan estas excepciones y el decorador `@api` (`comun/http.py`) las convierte en una respuesta JSON con su código HTTP. Las validaciones de datos de entrada (`entero`) están en `comun/validaciones.py`, separadas de HTTP.
 
 ---
 
@@ -196,7 +198,7 @@ En Windows usa **Git Bash** para que `curl` y las comillas se comporten igual.
 | POST | `/api/tickets/` | HU-05 | 201 · 400 · 404 |
 | GET | `/api/tickets/cola/` | HU-07 | 200 |
 | GET | `/api/tickets/<id>/` | HU-05 | 200 · 404 |
-| POST | `/api/tickets/<id>/tomar/` | HU-08 | 200 · 404 · 409 (ya asignado) |
+| POST | `/api/tickets/<id>/tomar/` | HU-08 | 200 · 400 · 403 (no es agente) · 404 · 409 (ya asignado) |
 
 ---
 
@@ -204,17 +206,27 @@ En Windows usa **Git Bash** para que `curl` y las comillas se comporten igual.
 
 ### 5.1 Dónde viven
 
-Cada módulo tiene una carpeta `pruebas/` con **un archivo por historia de usuario**:
+Cada módulo tiene una carpeta `pruebas/` con tres tipos de archivo:
 
-| Archivo de prueba | Historia | Cuántas |
-| --- | --- | --- |
-| `catalogo/pruebas/test_hu02_consultar_catalogo.py` | HU-02 Consultar catálogo | 3 |
-| `carrito/pruebas/test_hu04_checkout.py` | HU-04 Checkout | 3 |
-| `soporte/pruebas/test_hu05_crear_ticket.py` | HU-05 Crear ticket | 3 |
-| `soporte/pruebas/test_hu07_cola_sin_asignar.py` | HU-07 Cola sin asignar | 3 |
-| `soporte/pruebas/test_hu08_tomar_ticket.py` | HU-08 Tomar ticket (concurrencia) | 3 |
-| `catalogo/pruebas/test_datos_demo.py` | comando `cargar_datos_demo` | 2 |
-| | | **17** |
+- `test_huXX_*.py`: **integración/funcionales**. Un archivo por historia de usuario, que recorre HTTP → servicio → base de datos y verifica cada criterio de aceptación.
+- `test_unitarias_*.py`: **unitarias**. Prueban reglas del servicio o del modelo llamándolas directamente, sin HTTP (las de modelo y validación ni siquiera tocan la base de datos).
+- `test_casos_borde_*.py`: **casos borde** de punta a punta (repetidos, límites de stock, JSON mal formado, roles, estados cerrados…).
+
+| Archivo de prueba | Tipo | Historia | Cuántas |
+| --- | --- | --- | --- |
+| `catalogo/pruebas/test_hu02_consultar_catalogo.py` | integración | HU-02 Consultar catálogo | 3 |
+| `catalogo/pruebas/test_unitarias_catalogo.py` | unitaria | HU-02 | 5 |
+| `carrito/pruebas/test_hu04_checkout.py` | integración | HU-04 Checkout | 3 |
+| `carrito/pruebas/test_unitarias_checkout.py` | unitaria | HU-04 | 8 |
+| `carrito/pruebas/test_casos_borde_checkout.py` | casos borde | HU-04 | 7 |
+| `soporte/pruebas/test_hu05_crear_ticket.py` | integración | HU-05 Crear ticket | 3 |
+| `soporte/pruebas/test_hu07_cola_sin_asignar.py` | integración | HU-07 Cola sin asignar | 3 |
+| `soporte/pruebas/test_hu08_tomar_ticket.py` | integración | HU-08 Tomar ticket (concurrencia) | 3 |
+| `soporte/pruebas/test_unitarias_soporte.py` | unitaria | HU-05, HU-07, HU-08 | 9 |
+| `soporte/pruebas/test_casos_borde_soporte.py` | casos borde | HU-05, HU-07, HU-08 | 7 |
+| `comun/pruebas/test_unitarias_validaciones.py` | unitaria | validaciones compartidas | 10 |
+| `catalogo/pruebas/test_datos_demo.py` | integración | comando `cargar_datos_demo` | 2 |
+| | | | **63** |
 
 `comun/fabricas.py` **no tiene pruebas**: es una fábrica de datos de prueba que crea clientes, productos, pedidos y tickets ya listos, para no repetir las mismas líneas en cada test.
 
@@ -293,3 +305,6 @@ def test_criterio2_un_ticket_ya_tomado_responde_409(self):
 - [Problema duro](docs/problema-duro.md)
 - [Decisiones técnicas](docs/Decisiones-tecnicas.md)
 - [Selección de la rebanada vertical](docs/rebanada.md)
+- [Definición de Terminado](docs/definicion-de-terminado.md)
+- [Revisión de código (SOLID/GRASP) y refactorizaciones](docs/revision-codigo.md)
+- [Registro de deuda técnica](docs/deuda-tecnica.md)

@@ -4,8 +4,8 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 
 from carrito.models import Pedido
-from comun.excepciones import DatosInvalidos, EstadoInvalido, NoEncontrado
-from comun.http import entero
+from comun.excepciones import DatosInvalidos, EstadoInvalido, NoEncontrado, SinPermiso
+from comun.validaciones import entero
 
 from .models import RegistroAsignacion, TicketSoporte
 
@@ -57,8 +57,11 @@ def tomar_ticket(ticket_id, agente_id):
     Bloqueo pesimista: select_for_update bloquea la fila del ticket hasta que
     termina la transacción. Si dos agentes llegan a la vez, el segundo espera,
     luego ve el ticket ya asignado y recibe EstadoInvalido (409).
+    Solo los agentes (is_staff) pueden tomar tickets: un cliente recibe 403.
     """
     agente = _usuario(entero(agente_id, "id_agente"), "agente")
+    if not agente.is_staff:
+        raise SinPermiso("Solo un agente de soporte puede tomar tickets")
     try:
         ticket = TicketSoporte.objects.select_for_update().get(pk=ticket_id)
     except TicketSoporte.DoesNotExist:
@@ -79,19 +82,3 @@ def detalle_ticket(ticket_id):
         return TicketSoporte.objects.select_related("cliente", "pedido", "agente").get(pk=ticket_id)
     except TicketSoporte.DoesNotExist:
         raise NoEncontrado(f"El ticket {ticket_id} no existe")
-
-
-def a_dict(ticket):
-    return {
-        "id": ticket.pk,
-        "numero": ticket.numero,
-        "id_cliente": ticket.cliente_id,
-        "cliente": ticket.cliente.username,
-        "id_pedido": ticket.pedido_id,
-        "pedido": ticket.pedido.codigo if ticket.pedido else None,
-        "asunto": ticket.asunto,
-        "descripcion": ticket.descripcion,
-        "estado": ticket.estado,
-        "agente": ticket.agente.username if ticket.agente else None,
-        "fecha": ticket.creado_en.isoformat(),
-    }

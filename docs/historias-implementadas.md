@@ -11,7 +11,9 @@ Correr todas las pruebas (desde la carpeta `tests/`):
 python manage.py test
 ```
 
-Resultado esperado: **17 pruebas en verde** (3 por cada historia de usuario y 2 del comando `cargar_datos_demo`).
+Resultado esperado: **63 pruebas en verde**: 15 de integración por historia (3 por HU), 2 del comando `cargar_datos_demo`, 32 unitarias y 14 de casos borde. El detalle por archivo está en el README §5.1.
+
+Cada historia cumple la [Definición de Terminado](definicion-de-terminado.md).
 
 | HU | Historia | Endpoint | Archivo de pruebas | Pruebas |
 | --- | --- | --- | --- | --- |
@@ -87,6 +89,7 @@ python manage.py test carrito
 | --- | --- |
 | 1 y 4. El ticket queda asignado solo al agente que lo pidió y la asignación queda registrada (agente, ticket, fecha). | `test_criterio1y4_el_ticket_queda_asignado_y_registrado` |
 | 2. Si ya fue tomado, el otro agente recibe un mensaje claro (409) y el intento no deja registro. | `test_criterio2_un_ticket_ya_tomado_responde_409` |
+| Regla: solo un agente puede tomar tickets; un cliente recibe 403 (defecto RC-01 corregido). | `test_un_cliente_que_intenta_tomar_un_ticket_recibe_403` |
 | 3. Prueba automatizada de asignación concurrente con dos hilos. | `test_criterio3_dos_agentes_compiten_y_solo_uno_obtiene_el_ticket` |
 
 ```bash
@@ -99,6 +102,8 @@ python manage.py test soporte
 ---
 
 ## Pendientes del backlog
+
+Los pendientes están priorizados en [`deuda-tecnica.md`](deuda-tecnica.md).
 
 - **HU-01** (registro e inicio de sesión con roles): hoy la API recibe
   `id_cliente` / `id_agente` en el cuerpo de la petición. Cuando exista el

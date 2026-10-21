@@ -42,20 +42,3 @@ def leer_json(request):
     if not isinstance(datos, dict):
         raise DatosInvalidos("El cuerpo de la petición debe ser un objeto JSON")
     return datos
-
-
-def entero(valor, campo, obligatorio=True):
-    """Convierte `valor` a entero positivo o lanza DatosInvalidos."""
-    if valor is None:
-        if obligatorio:
-            raise DatosInvalidos(f"El campo '{campo}' es obligatorio")
-        return None
-    if isinstance(valor, bool):
-        raise DatosInvalidos(f"El campo '{campo}' debe ser un número entero")
-    try:
-        numero = int(valor)
-    except (TypeError, ValueError):
-        raise DatosInvalidos(f"El campo '{campo}' debe ser un número entero")
-    if numero < 1:
-        raise DatosInvalidos(f"El campo '{campo}' debe ser mayor que 0")
-    return numero
