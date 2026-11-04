@@ -10,7 +10,7 @@ Cada deuda tiene un origen, un impacto, un esfuerzo estimado y una prioridad.
 | --- | --- | --- | --- | --- | --- | --- |
 | DT-01 | La identidad (`id_cliente`, `id_agente`) llega en el cuerpo de la petición; no hay login ni roles (HU-01) | RC-12 | Alto | L | **P1** | ✅ Pagada (sesión + roles, ADL-01) |
 | DT-02 | HU-04 criterio 1: no existe carrito editable (agregar/quitar antes de pagar); el checkout recibe todo en una petición | DoD D1 | Alto | M | **P1** | ✅ Pagada (carrito en sesión, interfaz web) |
-| DT-03 | Falta el estado **Resuelto** en `TicketSoporte` (lo piden HU-06 y HU-10) | RC-02 | Alto | S | **P1** | Abierta |
+| DT-03 | Falta el estado **Resuelto** en `TicketSoporte` (lo piden HU-06 y HU-10) | RC-02 | Alto | S | **P1** | ✅ Pagada (HU-10: estados y transiciones) |
 | DT-04 | El proyecto Django vive en `tests/`; renombrar a `app/` o `backend/` | RC-09 | Medio | S | P2 | Abierta |
 | DT-05 | HU-07 criterio 3: la cola solo se ordena por fecha, no por estado | DoD D1 | Medio | S | P2 | Parcial: fecha en ambos sentidos (`?orden=`); por estado no aplica mientras la cola solo tenga abiertos |
 | DT-06 | Las excepciones del dominio conocen el código HTTP; mover el mapeo excepción → status al decorador `@api` | RC-05 | Medio | S | P2 | Abierta |

@@ -22,6 +22,10 @@ class EventoAuditoria(models.Model):
     TICKET_CREADO = "TICKET_CREADO"
     TICKET_TOMADO = "TICKET_TOMADO"
     TICKET_CONFLICTO = "TICKET_CONFLICTO"
+    TICKET_RESPONDIDO = "TICKET_RESPONDIDO"
+    TICKET_ESTADO = "TICKET_ESTADO"
+    PRODUCTO_CREADO = "PRODUCTO_CREADO"
+    PRODUCTO_EDITADO = "PRODUCTO_EDITADO"
     TIPOS = [
         (LOGIN_OK, "Inicio de sesión"),
         (LOGIN_FALLIDO, "Inicio de sesión fallido"),
@@ -36,6 +40,10 @@ class EventoAuditoria(models.Model):
         (TICKET_CREADO, "Ticket creado"),
         (TICKET_TOMADO, "Ticket tomado"),
         (TICKET_CONFLICTO, "Ticket ya asignado (409)"),
+        (TICKET_RESPONDIDO, "Ticket respondido"),
+        (TICKET_ESTADO, "Cambio de estado del ticket"),
+        (PRODUCTO_CREADO, "Producto creado"),
+        (PRODUCTO_EDITADO, "Producto editado"),
     ]
 
     fecha = models.DateTimeField(auto_now_add=True, db_index=True)

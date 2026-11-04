@@ -85,10 +85,10 @@ def resumen(sesion):
     return {"lineas": lineas, "total": total}
 
 
-def pagar(sesion, cliente):
+def pagar(sesion, cliente, envio):
     """Convierte el carrito en un pedido con el checkout transaccional."""
     carrito = _leer(sesion)
     items = [{"id_producto": pid, "cantidad": cant} for pid, cant in carrito.items()]
-    pedido = servicios.realizar_checkout(cliente.pk, items)
+    pedido = servicios.realizar_checkout(cliente.pk, items, envio)
     vaciar(sesion)
     return pedido

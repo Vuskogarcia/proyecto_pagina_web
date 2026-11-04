@@ -112,3 +112,31 @@ coverage run manage.py test -v 2 && coverage report --fail-under=85
 cd .. && bandit -r tests -x tests/venv,tests/.venv,tests/staticfiles --severity-level medium
 pip-audit -r tests/requirements.txt
 ```
+
+## 7. Actualización del 2026-11-04: historias que faltaban
+
+Se implementaron HU-03, el criterio 3 de HU-04, HU-06 completa, HU-09 y HU-10, cada una con su archivo de pruebas de seguridad. El [modelo de amenazas](modelo-amenazas.md) suma las amenazas A12 a A14.
+
+| Historia | Ataques simulados | Archivo | Pruebas |
+| --- | --- | --- | --- |
+| HU-03 Gestionar catálogo | Cliente, agente o staff sin superusuario intentando crear o editar (403); anónimo (401); precio negativo, `NaN`, `"1e5"`, dígitos árabes; stock negativo o enorme; asignación masiva (`id`, `creado_en`); XSS en el nombre; CSRF; cambio de precio sin alterar pedidos pagados | `catalogo/pruebas/test_seguridad_hu03.py` | 11 |
+| HU-04 Datos de envío | Campos faltantes o extra, NUL, largo excesivo, teléfono con letras o dígitos no ASCII; XSS y `' OR 1=1 --` guardados como texto; un intruso no ve la dirección; la auditoría no guarda datos personales | `carrito/pruebas/test_seguridad_envio.py` | 5 |
+| HU-10 Responder y cambiar estado | Anónimo, cliente y agente no asignado (401/403); estados inventados o de tipo incorrecto (400); saltos no permitidos (409); ticket cerrado; mensajes vacíos, enormes, NUL o surrogates; XSS; CSRF; **dos cierres simultáneos en PostgreSQL: solo uno gana** | `soporte/pruebas/test_seguridad_hu10.py` | 10 |
+
+### 7.1 Resultado (2026-11-04)
+
+| Verificación | Resultado |
+| --- | --- |
+| Pruebas en **PostgreSQL 16.2** (equipo de Kevin, Django 5.2) | **172 OK**: 71 de seguridad e incluye las dos de concurrencia (HU-08 y cierre simultáneo de HU-10) |
+| Pruebas en PostgreSQL 16 (nube, Django 6.1) | 172 OK |
+| Cobertura | **93 %** (umbral 85 %) |
+| bandit (severidad media o alta) | 0 hallazgos |
+| pip-audit | sin vulnerabilidades conocidas |
+| gitleaks (todo el historial) | sin secretos nuevos |
+| `makemigrations --check` · `check --deploy` | sin cambios pendientes · solo W021 (HSTS preload, decisión consciente) |
+
+Salida completa: [`evidencia/historias-completas-ejecucion-postgresql.txt`](evidencia/historias-completas-ejecucion-postgresql.txt).
+
+En el equipo de Kevin las pruebas se corrieron en dos tandas por el límite de tiempo de cada ejecución en ese entorno; en el CI corren de una sola vez.
+
+Durante esta verificación se corrigió la prueba guardia contra SQL crudo (`test_el_codigo_no_arma_sql_a_mano`): recorría también la carpeta `tests/venv` del equipo, con miles de archivos, y se volvía muy lenta. Ahora poda esas carpetas al recorrer (`os.walk`). Se comprobó que sigue detectando SQL crudo.

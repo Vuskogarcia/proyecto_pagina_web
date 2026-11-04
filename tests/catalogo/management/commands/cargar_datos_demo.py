@@ -102,15 +102,27 @@ class Command(BaseCommand):
         )
 
         # Pedidos: pasan por el checkout real, así que también descuentan el stock.
-        pedido_ana = pedidos.realizar_checkout(ana.pk, [{"id_producto": teclado.pk, "cantidad": 1}])
+        # Las direcciones son ficticias (datos de demostración).
+        def envio(usuario, direccion, ciudad, telefono):
+            return {"nombre": usuario.get_full_name(), "direccion": direccion,
+                    "ciudad": ciudad, "telefono": telefono}
+
+        pedido_ana = pedidos.realizar_checkout(
+            ana.pk, [{"id_producto": teclado.pk, "cantidad": 1}],
+            envio(ana, "Calle 10 # 20-30", "Bogotá", "3001234567"),
+        )
         pedido_luis = pedidos.realizar_checkout(
             luis.pk,
             [
                 {"id_producto": monitor.pk, "cantidad": 1},
                 {"id_producto": audifonos.pk, "cantidad": 2},
             ],
+            envio(luis, "Carrera 45 # 12-08", "Medellín", "3017654321"),
         )
-        pedidos.realizar_checkout(maria.pk, [{"id_producto": mouse.pk, "cantidad": 3}])
+        pedidos.realizar_checkout(
+            maria.pk, [{"id_producto": mouse.pk, "cantidad": 3}],
+            envio(maria, "Avenida 6N # 25-40", "Cali", "3159876543"),
+        )
 
         # Tickets: uno abierto en la cola, uno en proceso y uno cerrado.
         soporte.crear_ticket(
@@ -121,9 +133,15 @@ class Command(BaseCommand):
             asunto="Cambio de dirección",
         )
         soporte.tomar_ticket(en_proceso.pk, diana.pk)
+        soporte.responder_ticket(
+            en_proceso.pk, diana.pk,
+            "Hola Luis, ya estamos revisando el cambio de dirección con la transportadora.",
+        )
         cerrado = soporte.crear_ticket(maria.pk, "¿Cuánto dura la garantía?", asunto="Consulta sobre garantía")
         soporte.tomar_ticket(cerrado.pk, carlos.pk)
-        TicketSoporte.objects.filter(pk=cerrado.pk).update(estado=TicketSoporte.CERRADO)
+        soporte.responder_ticket(cerrado.pk, carlos.pk, "Hola María, la garantía es de 12 meses.")
+        soporte.cambiar_estado(cerrado.pk, carlos.pk, TicketSoporte.RESUELTO)
+        soporte.cambiar_estado(cerrado.pk, carlos.pk, TicketSoporte.CERRADO)
 
         self.stdout.write(self.style.SUCCESS("Datos de ejemplo cargados:"))
         self.stdout.write(f"  Clientes: ana, luis, maria · Agentes: carlos, diana (clave: {CLAVE_DEMO})")

@@ -9,5 +9,16 @@
   </div>
   {% if pedido.cliente_id == user.pk %}<a class="boton boton--secundario" href="{% url 'web:pqr_nueva' %}?pedido={{ pedido.pk }}">¿Problemas? Radica una PQR</a>{% endif %}
 </div>
-<div class="tarjeta">{% include "web/_pedido_detalle.html" %}</div>
+<div class="dos-columnas">
+  <div class="tarjeta">{% include "web/_pedido_detalle.html" %}</div>
+  <aside class="tarjeta">
+    <h2>Envío</h2>
+    <dl class="datos">
+      <dt>Recibe</dt><dd>{{ pedido.envio_nombre|default:"—" }}</dd>
+      <dt>Dirección</dt><dd>{{ pedido.envio_direccion|default:"—" }}</dd>
+      <dt>Ciudad</dt><dd>{{ pedido.envio_ciudad|default:"—" }}</dd>
+      <dt>Teléfono</dt><dd>{{ pedido.envio_telefono|default:"—" }}</dd>
+    </dl>
+  </aside>
+</div>
 {% endblock %}

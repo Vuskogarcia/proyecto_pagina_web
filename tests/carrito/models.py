@@ -23,6 +23,12 @@ class Pedido(models.Model):
     )
     estado = models.CharField(max_length=20, choices=ESTADOS, default=PENDIENTE)
     creado_en = models.DateTimeField(auto_now_add=True)
+    # Datos de envío (HU-04 criterio 3). Son datos personales: solo los ven
+    # el dueño del pedido y los agentes (ver pedido_visible_para).
+    envio_nombre = models.CharField("destinatario", max_length=150, blank=True)
+    envio_direccion = models.CharField("dirección", max_length=200, blank=True)
+    envio_ciudad = models.CharField("ciudad", max_length=100, blank=True)
+    envio_telefono = models.CharField("teléfono", max_length=20, blank=True)
 
     class Meta:
         ordering = ["-creado_en"]

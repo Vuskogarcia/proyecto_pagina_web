@@ -4,6 +4,23 @@ Plataforma web de venta en línea (catálogo, carrito, checkout, inventario) con
 
 **Problema técnico central:** evitar que dos agentes tomen el mismo ticket de soporte al mismo tiempo (ver [`docs/problema-duro.md`](docs/problema-duro.md)).
 
+### Historias de usuario: las 10 implementadas
+
+| HU | Historia | Rol | Dónde se prueba |
+| --- | --- | --- | --- |
+| HU-01 | Registro e inicio de sesión con roles | todos | `comun/pruebas/test_seguridad.py`, `web/pruebas/test_interfaz.py` |
+| HU-02 | Consultar el catálogo | todos | `catalogo/pruebas/test_hu02_*` |
+| HU-03 | Gestionar catálogo e inventario | administrador | `catalogo/pruebas/test_hu03_*`, `test_seguridad_hu03.py` |
+| HU-04 | Carrito, datos de envío y checkout | cliente | `carrito/pruebas/test_hu04_*`, `test_seguridad_envio.py` |
+| HU-05 | Radicar una PQR ligada a un pedido | cliente | `soporte/pruebas/test_hu05_*` |
+| HU-06 | Consultar el estado de mis PQR | cliente | `soporte/pruebas/test_hu06_*` |
+| HU-07 | Cola de PQR sin asignar | agente | `soporte/pruebas/test_hu07_*` |
+| HU-08 | Tomar una PQR con control de concurrencia | agente | `soporte/pruebas/test_hu08_*` |
+| HU-09 | Ver el pedido asociado a la PQR | agente | `soporte/pruebas/test_hu09_*` |
+| HU-10 | Responder y cambiar el estado (Abierto → En proceso → Resuelto → Cerrado) | agente | `soporte/pruebas/test_hu10_*`, `test_seguridad_hu10.py` |
+
+El detalle criterio por criterio está en [`docs/historias-implementadas.md`](docs/historias-implementadas.md).
+
 ---
 
 ## 1. El stack: qué es cada pieza
@@ -68,10 +85,10 @@ Cada módulo repite los mismos papeles:
 
 | Módulo | Entidades | Reglas principales (`servicios.py`) |
 | --- | --- | --- |
-| `catalogo/` | `Producto` | `listar_catalogo`, `detalle_producto` |
-| `carrito/` | `Pedido`, `ItemPedido` | `realizar_checkout`, `detalle_pedido` |
-| `soporte/` | `TicketSoporte`, `RegistroAsignacion` | `crear_ticket`, `cola_sin_asignar`, `tomar_ticket`, `ticket_visible_para` |
-| `cuentas/` | (usa `auth.User` y el grupo `agentes`) | `autenticar` (con límite de intentos), `registrar_cliente` |
+| `catalogo/` | `Producto` | `listar_catalogo`, `detalle_producto`, `crear_producto`, `actualizar_producto` |
+| `carrito/` | `Pedido` (con datos de envío), `ItemPedido` | `realizar_checkout`, `validar_envio`, `pedido_visible_para` |
+| `soporte/` | `TicketSoporte`, `RegistroAsignacion`, `RespuestaTicket` | `crear_ticket`, `cola_sin_asignar`, `tomar_ticket`, `responder_ticket`, `cambiar_estado`, `ticket_visible_para` |
+| `cuentas/` | `EventoAuditoria` (usa `auth.User` y el grupo `agentes`) | `autenticar` (con límite de intentos), `registrar_cliente`, `auditoria.registrar` |
 | `web/` | — | no tiene reglas: sus vistas llaman a los servicios de los otros módulos |
 
 ### 2.2 `comun/`: los errores del sistema
@@ -83,9 +100,9 @@ Cada módulo repite los mismos papeles:
 | `DatosInvalidos` | 400 | lo que llegó está mal formado o incompleto |
 | `SinPermiso` | 403 | el usuario existe pero su rol no le permite la operación (ej. un cliente tomando un ticket) |
 | `NoAutenticado` | 401 | la operación requiere iniciar sesión |
-| `DemasiadosIntentos` | 429 | se superó el límite de intentos de inicio de sesión |
+| `DemasiadosIntentos` | 429 | se superó el límite de intentos de inicio de sesión o de peticiones |
 
-Los servicios lanzan estas excepciones y el decorador `@api` (`comun/http.py`) las convierte en una respuesta JSON con su código HTTP. Además, `@api` exige sesión (y el rol de agente donde corresponde) y atrapa cualquier error no previsto: al cliente le devuelve un 500 genérico y el detalle queda en el log. Las validaciones de entrada (`entero`, `texto`) están en `comun/validaciones.py`, separadas de HTTP. Funcionan con **lista de permitidos**: solo enteros de verdad, con cota, y texto sin caracteres que PostgreSQL rechaza. El detalle está en [`docs/seguridad/`](docs/seguridad/semana-13.md).
+Los servicios lanzan estas excepciones y el decorador `@api` (`comun/http.py`) las convierte en una respuesta JSON con su código HTTP. Además, `@api` exige sesión (y el rol de agente o administrador donde corresponde) y atrapa cualquier error no previsto: al cliente le devuelve un 500 genérico y el detalle queda en el log. Las validaciones de entrada (`entero`, `texto`, `dinero`, `booleano`) están en `comun/validaciones.py`, separadas de HTTP. Funcionan con **lista de permitidos**: solo enteros de verdad, con cota, y texto sin caracteres que PostgreSQL rechaza. El detalle está en [`docs/seguridad/`](docs/seguridad/semana-13.md).
 
 ---
 
@@ -157,7 +174,17 @@ python manage.py cargar_datos_demo
 
 Llena las tablas de Django con los mismos datos de `database/02_seed.sql`: 5 productos (uno agotado), 3 clientes (`ana`, `luis`, `maria`), 2 agentes (`carlos`, `diana`, en el grupo `agentes`), 3 pedidos y 3 tickets (uno abierto, uno en proceso y uno cerrado). La clave de todos los usuarios de ejemplo es `demo12345`: **solo para la demo local**.
 
+El ticket en proceso ya tiene una respuesta del agente, y el cerrado pasó por Resuelto → Cerrado (HU-10).
+
 Si ya hay datos, no hace nada. Para borrarlos y cargarlos de nuevo: `python manage.py cargar_datos_demo --reset`.
+
+**Roles (HU-01):**
+
+| Rol | Quién | Cómo se asigna |
+| --- | --- | --- |
+| Cliente | cualquiera que se registra en `/registro/` | automático |
+| Agente | `carlos`, `diana` | `/admin/` → Usuarios → Grupos → `agentes` |
+| Administrador | el superusuario que crees | `python manage.py createsuperuser` (el comando de datos de ejemplo **no** crea administradores) |
 
 > Las tablas que crean los scripts de `database/` (`producto`, `pedido`, `cliente`…) **no son las que usa Django**. Django usa las suyas, con el nombre de la app adelante: `catalogo_producto`, `carrito_pedido`, `soporte_ticketsoporte`, `auth_user`.
 
@@ -167,7 +194,7 @@ Si ya hay datos, no hace nada. Para borrarlos y cargarlos de nuevo: `python mana
 python manage.py runserver
 ```
 
-- **Interfaz web: `http://127.0.0.1:8000/`**. Entra como `ana` (cliente) o `carlos` (agente). Ver [`docs/interfaz.md`](docs/interfaz.md).
+- **Interfaz web: `http://127.0.0.1:8000/`** (diseñada para computador). Entra como `ana` (cliente), `carlos` (agente) o con tu superusuario (administrador: menú «Gestión de catálogo»). Ver [`docs/interfaz.md`](docs/interfaz.md).
 - API: `http://127.0.0.1:8000/api/`
 - Panel de administración: `http://127.0.0.1:8000/admin/`
 
@@ -186,16 +213,17 @@ curl -s -b cookies.txt -c cookies.txt -H "X-CSRFToken: $TOKEN" -H 'Content-Type:
   -X POST localhost:8000/api/sesion/ -d '{"usuario": "ana", "clave": "demo12345"}'
 TOKEN=$(grep csrftoken cookies.txt | awk '{print $7}')   # el token rota al iniciar sesión
 
-# HU-04: comprar a nombre de la sesión
+# HU-04: comprar a nombre de la sesión (los datos de envío son obligatorios)
 curl -s -b cookies.txt -H "X-CSRFToken: $TOKEN" -H 'Content-Type: application/json' \
-  -X POST localhost:8000/api/pedidos/ -d '{"items": [{"id_producto": 1, "cantidad": 1}]}'
+  -X POST localhost:8000/api/pedidos/ -d '{"items": [{"id_producto": 1, "cantidad": 1}],
+  "envio": {"nombre": "Ana Torres", "direccion": "Calle 10 # 20-30", "ciudad": "Bogotá", "telefono": "3001234567"}}'
 
 # HU-05: radicar una PQR sobre uno de MIS pedidos (usa el id que devolvió el paso anterior)
 curl -s -b cookies.txt -H "X-CSRFToken: $TOKEN" -H 'Content-Type: application/json' \
   -X POST localhost:8000/api/tickets/ -d '{"tipo": "RECLAMO", "id_pedido": 4, "asunto": "Paquete", "descripcion": "No llegó"}'
 ```
 
-Para probar la cola (HU-07) y tomar tickets (HU-08), repite el inicio de sesión como `carlos`. Es más cómodo hacerlo desde la interfaz web.
+Para la cola (HU-07), tomar tickets (HU-08) y responderlos (HU-10), repite el inicio de sesión como `carlos`. Para gestionar el catálogo (HU-03), entra con tu superusuario. Es más cómodo hacerlo desde la interfaz web.
 
 ### 4.6 Endpoints
 
@@ -204,15 +232,20 @@ Para probar la cola (HU-07) y tomar tickets (HU-08), repite el inicio de sesión
 | GET · POST · DELETE | `/api/sesion/` | HU-01 | público | 200 · 204 · 401 · 429 |
 | POST | `/api/registro/` | HU-01 | público | 201 · 400 |
 | GET | `/api/productos/` | HU-02 | público | 200 |
+| POST | `/api/productos/` | HU-03 | administrador | 201 · 400 · 401 · 403 |
 | GET | `/api/productos/<id>/` | HU-02 | público | 200 · 404 |
+| PATCH | `/api/productos/<id>/` | HU-03 | administrador | 200 · 400 · 401 · 403 · 404 |
+| GET | `/api/gestion/productos/` | HU-03 | administrador | 200 (incluye los retirados) · 401 · 403 |
 | GET | `/api/pedidos/` | HU-04 | sesión | 200 (mis pedidos) |
-| POST | `/api/pedidos/` | HU-04 | sesión | 201 · 400 · 401 · 404 · 409 (sin stock) |
+| POST | `/api/pedidos/` (`items` + `envio`) | HU-04 | sesión | 201 · 400 · 401 · 404 · 409 (sin stock) |
 | GET | `/api/pedidos/<id>/` | HU-04, HU-09 | dueño o agente | 200 · 401 · 404 |
 | GET | `/api/tickets/` | HU-06 | sesión | 200 (mis tickets) |
 | POST | `/api/tickets/` | HU-05 | sesión | 201 · 400 · 401 · 404 |
 | GET | `/api/tickets/cola/?orden=antiguos` o `recientes` | HU-07 | agente | 200 · 401 · 403 |
-| GET | `/api/tickets/<id>/` | HU-05 | dueño o agente | 200 · 401 · 404 |
+| GET | `/api/tickets/<id>/` (incluye respuestas) | HU-05, HU-06, HU-10 | dueño o agente | 200 · 401 · 404 |
 | POST | `/api/tickets/<id>/tomar/` | HU-08 | agente | 200 · 400 · 401 · 403 · 404 · 409 (ya asignado) |
+| POST | `/api/tickets/<id>/respuestas/` (`mensaje`) | HU-10 | agente asignado | 201 · 400 · 401 · 403 · 404 · 409 (cerrado) |
+| POST | `/api/tickets/<id>/estado/` (`estado`) | HU-10 | agente asignado | 200 · 400 · 401 · 403 · 404 · 409 (transición no permitida) |
 
 Un pedido o ticket **ajeno responde 404**, igual que uno inexistente (ADL-03). Cualquier campo del cuerpo que no esté en la lista de permitidos responde 400.
 
@@ -227,27 +260,37 @@ Cada módulo tiene una carpeta `pruebas/` con tres tipos de archivo:
 - `test_huXX_*.py`: **integración/funcionales**. Un archivo por historia de usuario, que recorre HTTP → servicio → base de datos y verifica cada criterio de aceptación.
 - `test_unitarias_*.py`: **unitarias**. Prueban reglas del servicio o del modelo llamándolas directamente, sin HTTP (las de modelo y validación ni siquiera tocan la base de datos).
 - `test_casos_borde_*.py`: **casos borde** de punta a punta (repetidos, límites de stock, JSON mal formado, roles, estados cerrados…).
+- `test_seguridad*.py`: **seguridad**. Ataques simulados por historia: acceso por rol, objetos ajenos, entradas inválidas, XSS, CSRF, auditoría.
 
 | Archivo de prueba | Tipo | Historia | Cuántas |
 | --- | --- | --- | --- |
 | `catalogo/pruebas/test_hu02_consultar_catalogo.py` | integración | HU-02 Consultar catálogo | 3 |
+| `catalogo/pruebas/test_hu03_gestionar_catalogo.py` | integración | HU-03 Gestionar catálogo | 3 |
 | `catalogo/pruebas/test_unitarias_catalogo.py` | unitaria | HU-02 | 5 |
+| `catalogo/pruebas/test_seguridad_hu03.py` | seguridad | HU-03: solo administrador, validación, asignación masiva, XSS, CSRF | 11 |
+| `catalogo/pruebas/test_datos_demo.py` | integración | comando `cargar_datos_demo` | 2 |
 | `carrito/pruebas/test_hu04_checkout.py` | integración | HU-04 Checkout | 3 |
 | `carrito/pruebas/test_unitarias_checkout.py` | unitaria | HU-04 | 8 |
 | `carrito/pruebas/test_casos_borde_checkout.py` | casos borde | HU-04 | 7 |
+| `carrito/pruebas/test_seguridad_envio.py` | seguridad | HU-04: datos de envío (validación y privacidad) | 5 |
 | `soporte/pruebas/test_hu05_crear_ticket.py` | integración | HU-05 Crear ticket | 3 |
+| `soporte/pruebas/test_hu06_mis_tickets.py` | integración | HU-06 Mis tickets | 3 |
 | `soporte/pruebas/test_hu07_cola_sin_asignar.py` | integración | HU-07 Cola sin asignar | 3 |
 | `soporte/pruebas/test_hu08_tomar_ticket.py` | integración | HU-08 Tomar ticket (concurrencia) | 3 |
+| `soporte/pruebas/test_hu09_pedido_del_ticket.py` | integración | HU-09 Pedido del ticket | 3 |
+| `soporte/pruebas/test_hu10_responder_ticket.py` | integración | HU-10 Responder y cambiar estado | 3 |
 | `soporte/pruebas/test_unitarias_soporte.py` | unitaria | HU-05, HU-07, HU-08 | 9 |
 | `soporte/pruebas/test_casos_borde_soporte.py` | casos borde | HU-05, HU-07, HU-08 | 8 |
+| `soporte/pruebas/test_seguridad_hu10.py` | seguridad | HU-10: acceso, transiciones, validación, XSS, CSRF, concurrencia | 10 |
 | `comun/pruebas/test_unitarias_validaciones.py` | unitaria | validaciones compartidas | 10 |
 | `comun/pruebas/test_unitarias_seguridad.py` | unitaria | validación, roles, carrito en sesión | 10 |
 | `comun/pruebas/test_seguridad.py` | seguridad | hallazgos de la auditoría (ADL-01 a ADL-07, H13, H14) y HU-01 | 25 |
 | `comun/pruebas/test_ataques_simulados.py` | seguridad | ataques simulados de la semana 13: SQLi, XSS, IDOR, divulgación, fuerza bruta | 11 |
 | `cuentas/pruebas/test_auditoria_y_limites.py` | seguridad | registro de eventos críticos y límite de peticiones | 9 |
-| `web/pruebas/test_interfaz.py` | integración (web) | HU-01 y HU-04 a HU-09 desde la interfaz | 15 |
-| `catalogo/pruebas/test_datos_demo.py` | integración | comando `cargar_datos_demo` | 2 |
-| | | | **134** |
+| `web/pruebas/test_interfaz.py` | integración (web) | HU-01, HU-04 a HU-09 desde la interfaz | 15 |
+| | | | **172** |
+
+Hay **71 pruebas de seguridad** (todos los archivos `test_seguridad*`, `test_ataques_simulados` y `test_auditoria_y_limites`). Las de concurrencia (`HU08ConcurrenciaTests` y `CambioDeEstadoConcurrenteTests`) **necesitan PostgreSQL**.
 
 `comun/fabricas.py` **no tiene pruebas**: es una fábrica de datos de prueba que crea clientes, productos, pedidos y tickets ya listos, para no repetir las mismas líneas en cada test.
 
@@ -293,7 +336,7 @@ def test_criterio2_un_ticket_ya_tomado_responde_409(self):
 | `python manage.py test` | corre todas las pruebas |
 | `python manage.py makemigrations` | genera migraciones después de cambiar un `models.py` |
 | `python manage.py migrate` | aplica las migraciones a la base de datos |
-| `python manage.py createsuperuser` | crea un usuario para `/admin/` |
+| `python manage.py createsuperuser` | crea el administrador (gestión de catálogo y `/admin/`) |
 | `python manage.py cargar_datos_demo` | carga datos de ejemplo (`--reset` para recargarlos) |
 | `git log --oneline --graph` | la historia del proyecto en una pantalla |
 

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import RegistroAsignacion, TicketSoporte
+from .models import RegistroAsignacion, RespuestaTicket, TicketSoporte
 
 
 @admin.register(TicketSoporte)
@@ -12,3 +12,9 @@ class TicketSoporteAdmin(admin.ModelAdmin):
 @admin.register(RegistroAsignacion)
 class RegistroAsignacionAdmin(admin.ModelAdmin):
     list_display = ("ticket", "agente", "asignado_en")
+
+
+@admin.register(RespuestaTicket)
+class RespuestaTicketAdmin(admin.ModelAdmin):
+    list_display = ("ticket", "autor", "creado_en")
+    search_fields = ("ticket__id", "autor__username", "mensaje")

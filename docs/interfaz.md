@@ -10,7 +10,7 @@ Plantillas de Django servidas por el mismo proyecto (app `web/`). No usa JavaScr
 | --- | --- | --- |
 | **60 % · dominante** | `#F8F9FA` blanco grisáceo | fondo de todas las páginas; tarjetas en blanco puro |
 | **30 % · base profesional** | `#1A365D` azul marino | barra superior, títulos, encabezados de tabla, botones secundarios, foco |
-| **10 % · acento de acción** | `#FF6B6B` coral cálido | **solo** CTAs: «Añadir al carrito», «Pagar», «Enviar PQR», «Radicar PQR», «Tomar», «Entrar», «Crear cuenta» |
+| **10 % · acento de acción** | `#FF6B6B` coral cálido | **solo** CTAs: «Añadir al carrito», «Continuar al pago», «Pagar», «Enviar PQR», «Radicar PQR», «Tomar», «Enviar respuesta», «Nuevo producto», «Entrar», «Crear cuenta» |
 
 **Por qué el texto de los botones coral es oscuro y no blanco:** el blanco sobre `#FF6B6B` tiene un contraste de 2,8:1 y no cumple WCAG AA. Se usa `#0F213D` (marino oscuro), que da 5,8:1 y mantiene la marca.
 
@@ -30,14 +30,16 @@ Los errores usan un rojo (`#B42318`) distinto del coral, para no confundirlos co
 | Todos | `/` | Catálogo con agotados marcados | HU-02 |
 | Todos | `/productos/<id>/` | Detalle y cantidad | HU-02 |
 | Todos | `/entrar/`, `/registro/` | Inicio de sesión y registro (siempre como cliente) | HU-01 |
-| Cliente | `/carrito/` | Agregar, cambiar cantidad, quitar y pagar | HU-04 |
+| Cliente | `/carrito/` | Agregar, cambiar cantidad y quitar | HU-04 |
+| Cliente | `/carrito/pagar/` | Datos de envío (nombre, dirección, ciudad, teléfono) y pago | HU-04 |
 | Cliente | `/pedidos/`, `/pedidos/<id>/` | Mis pedidos y su detalle | HU-04 |
 | Cliente | `/pqr/nueva/` | Radicar una petición, queja o reclamo ligada a un pedido | HU-05 |
-| Cliente | `/pqr/`, `/pqr/<id>/` | Mis PQR y su estado | HU-06 |
+| Cliente | `/pqr/`, `/pqr/<id>/` | Mis PQR, su estado y las respuestas del agente | HU-06, HU-10 |
 | Agente | `/agente/` | Cola sin asignar, ordenable, con botón «Tomar» | HU-07, HU-08 |
 | Agente | `/agente/mis-tickets/` | PQR asignadas | HU-08 |
-| Agente | `/pqr/<id>/` | Detalle con los productos del pedido | HU-09 |
-| Administrador | `/admin/` | Productos, usuarios y asignación del rol de agente | HU-03 |
+| Agente | `/pqr/<id>/` | Detalle con los productos del pedido; si la tiene asignada: responder y cambiar estado | HU-09, HU-10 |
+| Administrador | `/gestion/productos/` | Crear, editar (precio, stock, descripción) y retirar o republicar productos | HU-03 |
+| Administrador | `/admin/` | Usuarios, asignación del rol de agente y registro de auditoría | HU-01 |
 
 Si dos agentes pulsan «Tomar» sobre la misma PQR, el segundo vuelve a la cola con el aviso *«No pudiste tomar el ticket: El ticket ya fue asignado»*. Es el problema duro visto desde la interfaz.
 

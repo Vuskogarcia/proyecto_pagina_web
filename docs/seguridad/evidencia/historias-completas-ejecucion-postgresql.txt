@@ -1,0 +1,306 @@
+# Ejecución de pruebas: todas las historias (HU-01 a HU-10). PostgreSQL 16.2 en el equipo de Kevin
+# Fecha: 2026-11-04 14:22 (America/Bogota) · Django 5.2.18 · Python 3.10.12
+# Se corrió en dos tandas por el límite de tiempo de cada ejecución en este entorno:
+#   1) coverage run -p manage.py test --noinput -v 2 catalogo carrito cuentas comun   (112 pruebas)
+#   2) coverage run -p manage.py test --noinput -v 2 soporte web                     (60 pruebas)
+#   Total: 172 pruebas, todas OK. Cobertura combinada abajo.
+
+# ==== Tanda 1 ====
+Creating test database for alias 'default' ('test_ecommerce_db')...
+Got an error creating the test database: database "test_ecommerce_db" already exists
+
+Destroying old test database for alias 'default' ('test_ecommerce_db')...
+Found 112 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: messages, staticfiles, web
+  Apply all migrations: admin, auth, carrito, catalogo, contenttypes, cuentas, sessions, soporte
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying catalogo.0001_initial... OK
+  Applying carrito.0001_initial... OK
+  Applying carrito.0002_datos_envio... OK
+  Applying cuentas.0001_grupo_agentes... OK
+  Applying cuentas.0002_evento_auditoria... OK
+  Applying cuentas.0003_nuevos_eventos... OK
+  Applying sessions.0001_initial... OK
+  Applying soporte.0001_initial... OK
+  Applying soporte.0002_tipo_pqr... OK
+  Applying soporte.0003_respuestas_y_resuelto...test_carga_los_datos_y_no_los_duplica (catalogo.pruebas.test_datos_demo.CargarDatosDemoTests) ... ok
+test_reset_vuelve_a_cargar_desde_cero (catalogo.pruebas.test_datos_demo.CargarDatosDemoTests) ... ok
+test_criterio1y2_muestra_solo_productos_activos_con_nombre_precio_y_descripcion (catalogo.pruebas.test_hu02_consultar_catalogo.HU02ConsultarCatalogoTests) ... ok
+test_criterio3_consultar_detalle_de_un_producto (catalogo.pruebas.test_hu02_consultar_catalogo.HU02ConsultarCatalogoTests) ... ok
+test_criterio4_producto_sin_stock_se_identifica_como_agotado (catalogo.pruebas.test_hu02_consultar_catalogo.HU02ConsultarCatalogoTests) ... ok
+test_criterio1y4_crea_un_producto_y_aparece_en_el_catalogo (catalogo.pruebas.test_hu03_gestionar_catalogo.HU03GestionarCatalogoTests) ... ok
+test_criterio2y4_modifica_nombre_descripcion_precio_y_stock (catalogo.pruebas.test_hu03_gestionar_catalogo.HU03GestionarCatalogoTests) ... ok
+test_criterio3y4_desactivar_lo_retira_del_catalogo_sin_borrarlo (catalogo.pruebas.test_hu03_gestionar_catalogo.HU03GestionarCatalogoTests) ... ok
+test_crear_y_editar_quedan_en_auditoria (catalogo.pruebas.test_seguridad_hu03.AuditoriaYCsrfHU03Tests) ... ok
+test_la_api_y_la_web_exigen_csrf (catalogo.pruebas.test_seguridad_hu03.AuditoriaYCsrfHU03Tests) ... ok
+test_positivo_el_administrador_crea_edita_y_retira_desde_la_web (catalogo.pruebas.test_seguridad_hu03.AuditoriaYCsrfHU03Tests) ... ok
+test_la_web_de_gestion_es_solo_para_administradores (catalogo.pruebas.test_seguridad_hu03.ControlDeAccesoHU03Tests) ... ok
+test_solo_el_administrador_crea_edita_o_lista_todo (catalogo.pruebas.test_seguridad_hu03.ControlDeAccesoHU03Tests) ... ok
+test_cambiar_el_precio_no_altera_pedidos_ya_pagados (catalogo.pruebas.test_seguridad_hu03.IntegridadYXssHU03Tests) ... ok
+test_un_producto_retirado_no_se_puede_comprar (catalogo.pruebas.test_seguridad_hu03.IntegridadYXssHU03Tests) ... ok
+test_xss_en_el_nombre_se_muestra_escapado_en_la_tienda (catalogo.pruebas.test_seguridad_hu03.IntegridadYXssHU03Tests) ... ok
+test_editar_producto_inexistente_responde_404 (catalogo.pruebas.test_seguridad_hu03.ValidacionHU03Tests) ... ok
+test_no_se_pueden_fijar_campos_internos_asignacion_masiva (catalogo.pruebas.test_seguridad_hu03.ValidacionHU03Tests) ... ok
+test_valores_invalidos_responden_400_y_no_cambian_nada (catalogo.pruebas.test_seguridad_hu03.ValidacionHU03Tests) ... ok
+test_detalle_de_producto_inactivo_lanza_no_encontrado (catalogo.pruebas.test_unitarias_catalogo.CatalogoServicioTests) ... ok
+test_listar_catalogo_excluye_productos_inactivos (catalogo.pruebas.test_unitarias_catalogo.CatalogoServicioTests) ... ok
+test_cantidad_negativa_o_booleana_responde_400 (carrito.pruebas.test_casos_borde_checkout.CheckoutCasosBordeTests) ... ok
+test_comprar_exactamente_todo_el_stock_lo_deja_agotado (carrito.pruebas.test_casos_borde_checkout.CheckoutCasosBordeTests) ... ok
+test_cuerpo_mal_formado_responde_400 (carrito.pruebas.test_casos_borde_checkout.CheckoutCasosBordeTests) ... ok
+test_el_mismo_producto_repetido_se_agrupa_en_un_solo_item (carrito.pruebas.test_casos_borde_checkout.CheckoutCasosBordeTests) ... ok
+test_pedido_inexistente_responde_404_y_metodo_no_permitido_405 (carrito.pruebas.test_casos_borde_checkout.CheckoutCasosBordeTests) ... ok
+test_producto_retirado_del_catalogo_no_se_puede_comprar (carrito.pruebas.test_casos_borde_checkout.CheckoutCasosBordeTests) ... ok
+test_repetido_que_en_suma_supera_el_stock_responde_409 (carrito.pruebas.test_casos_borde_checkout.CheckoutCasosBordeTests) ... ok
+test_criterio2_calcula_el_total_y_descuenta_el_stock (carrito.pruebas.test_hu04_checkout.HU04CheckoutTests) ... ok
+test_criterio3_datos_invalidos_o_sin_stock_no_crean_el_pedido (carrito.pruebas.test_hu04_checkout.HU04CheckoutTests) ... ok
+test_criterio4_genera_pedido_con_identificador_unico (carrito.pruebas.test_hu04_checkout.HU04CheckoutTests) ... ok
+test_el_registro_de_auditoria_no_guarda_la_direccion_ni_el_telefono (carrito.pruebas.test_seguridad_envio.PrivacidadDelEnvioTests) ... ok
+test_positivo_el_duenio_y_el_agente_si_ven_el_envio (carrito.pruebas.test_seguridad_envio.PrivacidadDelEnvioTests) ... ok
+test_un_intruso_no_ve_la_direccion_ni_por_api_ni_por_web (carrito.pruebas.test_seguridad_envio.PrivacidadDelEnvioTests) ... ok
+test_envio_mal_formado_responde_400_y_no_crea_pedido_ni_descuenta_stock (carrito.pruebas.test_seguridad_envio.ValidacionDelEnvioTests) ... ok
+test_positivo_xss_y_sqli_se_guardan_como_texto_y_se_muestran_escapados (carrito.pruebas.test_seguridad_envio.ValidacionDelEnvioTests) ... ok
+test_cliente_inexistente_lanza_no_encontrado (carrito.pruebas.test_unitarias_checkout.RealizarCheckoutServicioTests) ... ok
+test_crea_el_pedido_con_el_precio_del_momento (carrito.pruebas.test_unitarias_checkout.RealizarCheckoutServicioTests) ... ok
+test_sin_stock_suficiente_lanza_estado_invalido (carrito.pruebas.test_unitarias_checkout.RealizarCheckoutServicioTests) ... ok
+test_api_cuarta_escritura_en_el_minuto_responde_429_y_no_crea_nada (cuentas.pruebas.test_auditoria_y_limites.LimiteDePeticionesTests) ... ok
+test_el_limite_es_por_usuario (cuentas.pruebas.test_auditoria_y_limites.LimiteDePeticionesTests) ... ok
+test_registro_limitado_por_ip (cuentas.pruebas.test_auditoria_y_limites.LimiteDePeticionesTests) ... ok
+test_web_tambien_limita_y_muestra_pagina_429 (cuentas.pruebas.test_auditoria_y_limites.LimiteDePeticionesTests) ... ok
+test_accesos_denegados_csrf_y_error_interno_quedan_registrados (cuentas.pruebas.test_auditoria_y_limites.RegistroDeEventosCriticosTests) ... ok
+test_el_admin_solo_puede_leer_el_registro (cuentas.pruebas.test_auditoria_y_limites.RegistroDeEventosCriticosTests) ... ok
+test_login_fallido_exitoso_y_salida_quedan_registrados_sin_la_clave (cuentas.pruebas.test_auditoria_y_limites.RegistroDeEventosCriticosTests) ... ok
+test_operaciones_de_negocio_y_conflicto_409_quedan_registradas (cuentas.pruebas.test_auditoria_y_limites.RegistroDeEventosCriticosTests) ... ok
+test_un_pedido_revertido_no_deja_evento (cuentas.pruebas.test_auditoria_y_limites.RegistroDeEventosCriticosTests) ... ok
+test_debug_true_en_la_url_no_activa_nada (comun.pruebas.test_ataques_simulados.DivulgacionDeInformacionTests) ... ok
+test_el_login_no_revela_si_el_usuario_existe (comun.pruebas.test_ataques_simulados.DivulgacionDeInformacionTests) ... ok
+test_un_error_interno_no_muestra_detalles_aunque_pidan_debug (comun.pruebas.test_ataques_simulados.DivulgacionDeInformacionTests) ... ok
+test_api_y_web_bloquean_tras_5_intentos (comun.pruebas.test_ataques_simulados.FuerzaBrutaTests) ... ok
+test_recorrer_ids_consecutivos_no_revela_pedidos_ni_tickets_ajenos (comun.pruebas.test_ataques_simulados.IdorTests) ... ok
+test_el_codigo_no_arma_sql_a_mano (comun.pruebas.test_ataques_simulados.InyeccionSqlTests)
+Guardia estática: toda consulta pasa por el ORM (parametrizada). ... ok
+test_la_carga_en_parametros_y_urls_no_cambia_la_consulta (comun.pruebas.test_ataques_simulados.InyeccionSqlTests) ... ok
+test_la_carga_se_guarda_como_texto_y_no_se_ejecuta (comun.pruebas.test_ataques_simulados.InyeccionSqlTests) ... ok
+test_login_con_or_1_1_no_entra (comun.pruebas.test_ataques_simulados.InyeccionSqlTests) ... ok
+test_el_agente_y_el_cliente_ven_el_script_escapado (comun.pruebas.test_ataques_simulados.XssTests) ... ok
+test_la_csp_impide_ejecutar_scripts_en_linea (comun.pruebas.test_ataques_simulados.XssTests) ... ok
+test_el_cuerpo_ya_no_puede_suplantar_a_otro_usuario (comun.pruebas.test_seguridad.ADL01IdentidadDesdeLaSesionTests) ... ok
+test_la_cola_es_solo_para_agentes (comun.pruebas.test_seguridad.ADL01IdentidadDesdeLaSesionTests) ... ok
+test_positivo_el_pedido_y_el_ticket_quedan_a_nombre_del_usuario_en_sesion (comun.pruebas.test_seguridad.ADL01IdentidadDesdeLaSesionTests) ... ok
+test_sin_sesion_la_api_protegida_responde_401_y_no_cambia_nada (comun.pruebas.test_seguridad.ADL01IdentidadDesdeLaSesionTests) ... ok
+test_tomar_ticket_usa_el_agente_en_sesion (comun.pruebas.test_seguridad.ADL01IdentidadDesdeLaSesionTests) ... ok
+test_crear_ticket_con_pedido_ajeno_responde_404_y_no_crea_nada (comun.pruebas.test_seguridad.ADL03ObjetosAjenosResponden404Tests) ... ok
+test_pedido_y_ticket_ajenos_se_ven_igual_que_inexistentes (comun.pruebas.test_seguridad.ADL03ObjetosAjenosResponden404Tests) ... ok
+test_positivo_el_duenio_y_los_agentes_si_ven_el_pedido_y_el_ticket (comun.pruebas.test_seguridad.ADL03ObjetosAjenosResponden404Tests) ... ok
+test_campos_desconocidos_en_el_cuerpo_responden_400 (comun.pruebas.test_seguridad.ADL04ValidacionConListaDePermitidosYCotasTests) ... ok
+test_id_enorme_en_la_url_responde_404_y_no_500 (comun.pruebas.test_seguridad.ADL04ValidacionConListaDePermitidosYCotasTests) ... ok
+test_positivo_entero_como_numero_o_como_texto_de_digitos (comun.pruebas.test_seguridad.ADL04ValidacionConListaDePermitidosYCotasTests) ... ok
+test_valores_fuera_de_la_lista_de_permitidos_responden_400 (comun.pruebas.test_seguridad.ADL04ValidacionConListaDePermitidosYCotasTests) ... ok
+test_nul_y_surrogate_suelto_responden_400_y_no_crean_ticket (comun.pruebas.test_seguridad.ADL05TextoConNulYSurrogatesTests) ... ok
+test_positivo_tildes_y_emoji_si_se_aceptan (comun.pruebas.test_seguridad.ADL05TextoConNulYSurrogatesTests) ... ok
+test_error_inesperado_responde_500_generico_y_queda_en_el_log (comun.pruebas.test_seguridad.ADL06RedGenericaDeExcepcionesTests) ... ok
+test_positivo_los_errores_de_negocio_conservan_su_codigo (comun.pruebas.test_seguridad.ADL06RedGenericaDeExcepcionesTests) ... ok
+test_positivo_con_clave_propia_debug_queda_apagado_por_defecto (comun.pruebas.test_seguridad.ADL07ConfiguracionSeguraPorDefectoTests) ... ok
+test_secret_key_de_ejemplo_no_se_acepta_en_produccion (comun.pruebas.test_seguridad.ADL07ConfiguracionSeguraPorDefectoTests) ... ok
+test_sin_secret_key_no_arranca (comun.pruebas.test_seguridad.ADL07ConfiguracionSeguraPorDefectoTests) ... ok
+test_respuestas_llevan_csp_y_cabeceras_basicas (comun.pruebas.test_seguridad.CabecerasDeSeguridadTests) ... ok
+test_sin_token_csrf_responde_403_json_y_con_token_201 (comun.pruebas.test_seguridad.H13CsrfConSesionTests) ... ok
+test_agente_no_entra_al_admin_pero_si_toma_tickets (comun.pruebas.test_seguridad.H14AgentesSinAccesoAlAdminTests) ... ok
+test_login_correcto_y_mensaje_igual_para_usuario_o_clave_incorrectos (comun.pruebas.test_seguridad.SesionYRegistroTests) ... ok
+test_registro_crea_cliente_y_no_permite_elegir_rol (comun.pruebas.test_seguridad.SesionYRegistroTests) ... ok
+test_tras_5_intentos_fallidos_se_bloquea_aunque_la_clave_sea_correcta (comun.pruebas.test_seguridad.SesionYRegistroTests) ... ok
+test_agrega_suma_y_calcula_total_con_precio_de_la_base (comun.pruebas.test_unitarias_seguridad.CarritoSesionTests) ... ok
+test_cantidad_fuera_de_cota_se_rechaza (comun.pruebas.test_unitarias_seguridad.CarritoSesionTests) ... ok
+test_producto_inexistente_o_retirado_no_entra_al_carrito (comun.pruebas.test_unitarias_seguridad.CarritoSesionTests) ... ok
+test_agente_es_el_grupo_no_is_staff (comun.pruebas.test_unitarias_seguridad.RolesTests) ... ok
+test_agotado_solo_cuando_el_stock_es_cero (catalogo.pruebas.test_unitarias_catalogo.ProductoModeloTests) ... ok
+test_hay_disponible_compara_contra_el_stock (catalogo.pruebas.test_unitarias_catalogo.ProductoModeloTests) ... ok
+test_serializador_expone_precio_como_texto_y_marca_agotado (catalogo.pruebas.test_unitarias_catalogo.ProductoModeloTests) ... ok
+test_agrupa_cantidades_del_mismo_producto (carrito.pruebas.test_unitarias_checkout.NormalizarItemsTests) ... ok
+test_item_que_no_es_objeto_lanza_datos_invalidos (carrito.pruebas.test_unitarias_checkout.NormalizarItemsTests) ... ok
+test_lista_vacia_o_que_no_es_lista_lanza_datos_invalidos (carrito.pruebas.test_unitarias_checkout.NormalizarItemsTests) ... ok
+test_codigo_tiene_formato_ped_con_cinco_digitos (carrito.pruebas.test_unitarias_checkout.PedidoModeloTests) ... ok
+test_subtotal_es_precio_por_cantidad (carrito.pruebas.test_unitarias_checkout.PedidoModeloTests) ... ok
+test_cota_personalizada (comun.pruebas.test_unitarias_seguridad.EnteroListaDePermitidosTests) ... ok
+test_rechaza_float_digitos_no_ascii_espacios_y_fuera_de_cota (comun.pruebas.test_unitarias_seguridad.EnteroListaDePermitidosTests) ... ok
+test_id_fuera_de_rango_no_llega_a_la_consulta (comun.pruebas.test_unitarias_seguridad.IdConverterTests) ... ok
+test_acepta_tildes_emoji_y_saltos_de_linea (comun.pruebas.test_unitarias_seguridad.TextoSeguroTests) ... ok
+test_rechaza_nul_y_surrogates_sueltos (comun.pruebas.test_unitarias_seguridad.TextoSeguroTests) ... ok
+test_texto_valida_largo_y_obligatorio (comun.pruebas.test_unitarias_seguridad.TextoSeguroTests) ... ok
+test_convierte_numeros_y_textos_numericos (comun.pruebas.test_unitarias_validaciones.EnteroTests) ... ok
+test_obligatorio_ausente_lanza_datos_invalidos (comun.pruebas.test_unitarias_validaciones.EnteroTests) ... ok
+test_opcional_ausente_devuelve_none (comun.pruebas.test_unitarias_validaciones.EnteroTests) ... ok
+test_rechaza_cero_y_negativos (comun.pruebas.test_unitarias_validaciones.EnteroTests) ... ok
+test_rechaza_valores_no_enteros (comun.pruebas.test_unitarias_validaciones.EnteroTests) ... ok
+test_cada_error_lleva_su_codigo_http (comun.pruebas.test_unitarias_validaciones.ExcepcionesTests) ... ok
+test_cuerpo_vacio_es_un_objeto_vacio (comun.pruebas.test_unitarias_validaciones.LeerJsonTests) ... ok
+test_devuelve_el_objeto_json (comun.pruebas.test_unitarias_validaciones.LeerJsonTests) ... ok
+test_json_mal_formado_lanza_datos_invalidos (comun.pruebas.test_unitarias_validaciones.LeerJsonTests) ... ok
+test_json_que_no_es_objeto_lanza_datos_invalidos (comun.pruebas.test_unitarias_validaciones.LeerJsonTests) ... ok
+
+----------------------------------------------------------------------
+Ran 112 tests in 53.632s
+
+OK
+Destroying test database for alias 'default' ('test_ecommerce_db')...
+ OK
+System check identified no issues (0 silenced).
+
+# ==== Tanda 2 ====
+Creating test database for alias 'default' ('test_ecommerce_db')...
+Found 60 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: messages, staticfiles, web
+  Apply all migrations: admin, auth, carrito, catalogo, contenttypes, cuentas, sessions, soporte
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying catalogo.0001_initial... OK
+  Applying carrito.0001_initial... OK
+  Applying carrito.0002_datos_envio... OK
+  Applying cuentas.0001_grupo_agentes... OK
+  Applying cuentas.0002_evento_auditoria... OK
+  Applying cuentas.0003_nuevos_eventos... OK
+  Applying sessions.0001_initial... OK
+  Applying soporte.0001_initial... OK
+  Applying soporte.0002_tipo_pqr... OK
+  Applying soporte.0003_respuestas_y_resuelto...test_enviar_id_agente_en_el_cuerpo_responde_400 (soporte.pruebas.test_casos_borde_soporte.SoporteCasosBordeTests) ... ok
+test_la_cola_se_puede_ordenar_de_la_mas_nueva_a_la_mas_antigua (soporte.pruebas.test_casos_borde_soporte.SoporteCasosBordeTests) ... ok
+test_la_cola_vacia_responde_200_con_lista_vacia (soporte.pruebas.test_casos_borde_soporte.SoporteCasosBordeTests) ... ok
+test_ticket_sin_pedido_se_crea_y_muestra_pedido_nulo (soporte.pruebas.test_casos_borde_soporte.SoporteCasosBordeTests) ... ok
+test_tomar_sin_sesion_responde_401 (soporte.pruebas.test_casos_borde_soporte.SoporteCasosBordeTests) ... ok
+test_un_cliente_que_intenta_tomar_un_ticket_recibe_403 (soporte.pruebas.test_casos_borde_soporte.SoporteCasosBordeTests) ... ok
+test_un_ticket_cerrado_no_se_puede_tomar_ni_aparece_en_la_cola (soporte.pruebas.test_casos_borde_soporte.SoporteCasosBordeTests) ... ok
+test_ver_ticket_inexistente_responde_404 (soporte.pruebas.test_casos_borde_soporte.SoporteCasosBordeTests) ... ok
+test_crear_ticket_endpoint_e2e (soporte.pruebas.test_hu05_crear_ticket.HU05CrearTicketTests) ... ok
+test_criterio3_genera_un_numero_unico_de_ticket (soporte.pruebas.test_hu05_crear_ticket.HU05CrearTicketTests) ... ok
+test_datos_invalidos_o_pedido_ajeno_no_crean_el_ticket (soporte.pruebas.test_hu05_crear_ticket.HU05CrearTicketTests) ... ok
+test_criterio1y2_veo_solo_mis_tickets_con_numero_fecha_asunto_y_pedido (soporte.pruebas.test_hu06_mis_tickets.HU06MisTicketsTests) ... ok
+test_criterio3_muestra_los_estados_abierto_en_proceso_resuelto_y_cerrado (soporte.pruebas.test_hu06_mis_tickets.HU06MisTicketsTests) ... ok
+test_criterio4_el_estado_se_actualiza_cuando_el_agente_hace_cambios (soporte.pruebas.test_hu06_mis_tickets.HU06MisTicketsTests) ... ok
+test_criterio1y4_muestra_solo_los_tickets_sin_asignar (soporte.pruebas.test_hu07_cola_sin_asignar.HU07ColaSinAsignarTests) ... ok
+test_criterio2_cada_ticket_muestra_cliente_y_pedido (soporte.pruebas.test_hu07_cola_sin_asignar.HU07ColaSinAsignarTests) ... ok
+test_criterio3_ordenada_por_fecha_del_mas_antiguo_al_mas_nuevo (soporte.pruebas.test_hu07_cola_sin_asignar.HU07ColaSinAsignarTests) ... ok
+test_criterio1y4_el_ticket_queda_asignado_y_registrado (soporte.pruebas.test_hu08_tomar_ticket.HU08TomarTicketTests) ... ok
+test_criterio2_un_ticket_ya_tomado_responde_409 (soporte.pruebas.test_hu08_tomar_ticket.HU08TomarTicketTests) ... ok
+test_criterio1_desde_el_ticket_se_llega_al_pedido (soporte.pruebas.test_hu09_pedido_del_ticket.HU09PedidoDelTicketTests) ... ok
+test_criterio2y3_muestra_productos_fecha_y_estado_del_pedido (soporte.pruebas.test_hu09_pedido_del_ticket.HU09PedidoDelTicketTests) ... ok
+test_criterio4_la_informacion_corresponde_al_pedido_del_ticket (soporte.pruebas.test_hu09_pedido_del_ticket.HU09PedidoDelTicketTests) ... ok
+test_criterio1_solo_el_agente_asignado_puede_responder (soporte.pruebas.test_hu10_responder_ticket.HU10ResponderTicketTests) ... ok
+test_criterio2_la_respuesta_queda_registrada_con_fecha_y_autor (soporte.pruebas.test_hu10_responder_ticket.HU10ResponderTicketTests) ... ok
+test_criterio3y4_cambia_el_estado_y_el_cliente_ve_respuesta_y_estado (soporte.pruebas.test_hu10_responder_ticket.HU10ResponderTicketTests) ... ok
+test_anonimo_cliente_y_agente_no_asignado_no_pueden_responder_ni_cambiar_estado (soporte.pruebas.test_seguridad_hu10.ControlDeAccesoHU10Tests) ... ok
+test_ticket_inexistente_responde_404 (soporte.pruebas.test_seguridad_hu10.ControlDeAccesoHU10Tests) ... ok
+test_cada_respuesta_y_cambio_de_estado_queda_en_auditoria (soporte.pruebas.test_seguridad_hu10.TransicionesYValidacionHU10Tests) ... ok
+test_estados_invalidos_o_saltos_no_permitidos (soporte.pruebas.test_seguridad_hu10.TransicionesYValidacionHU10Tests) ... ok
+test_mensajes_invalidos_responden_400 (soporte.pruebas.test_seguridad_hu10.TransicionesYValidacionHU10Tests) ... ok
+test_un_ticket_cerrado_no_admite_respuestas_ni_cambios (soporte.pruebas.test_seguridad_hu10.TransicionesYValidacionHU10Tests) ... ok
+test_xss_en_la_respuesta_se_muestra_escapado_al_cliente (soporte.pruebas.test_seguridad_hu10.TransicionesYValidacionHU10Tests) ... ok
+test_los_formularios_exigen_csrf_y_un_cliente_no_entra (soporte.pruebas.test_seguridad_hu10.WebHU10Tests) ... ok
+test_positivo_el_agente_asignado_responde_y_resuelve_desde_la_web (soporte.pruebas.test_seguridad_hu10.WebHU10Tests) ... ok
+test_solo_devuelve_abiertos_sin_agente_del_mas_antiguo_al_mas_nuevo (soporte.pruebas.test_unitarias_soporte.ColaSinAsignarServicioTests) ... ok
+test_asunto_se_recorta_a_200_caracteres (soporte.pruebas.test_unitarias_soporte.CrearTicketServicioTests) ... ok
+test_descripcion_que_no_es_texto_lanza_datos_invalidos (soporte.pruebas.test_unitarias_soporte.CrearTicketServicioTests) ... ok
+test_limpia_espacios_de_la_descripcion (soporte.pruebas.test_unitarias_soporte.CrearTicketServicioTests) ... ok
+test_asigna_el_ticket_y_deja_registro (soporte.pruebas.test_unitarias_soporte.TomarTicketServicioTests) ... ok
+test_ticket_cerrado_no_se_puede_tomar (soporte.pruebas.test_unitarias_soporte.TomarTicketServicioTests) ... ok
+test_ticket_inexistente_lanza_no_encontrado (soporte.pruebas.test_unitarias_soporte.TomarTicketServicioTests) ... ok
+test_un_cliente_no_puede_tomar_tickets (soporte.pruebas.test_unitarias_soporte.TomarTicketServicioTests) ... ok
+test_anonimo_ve_el_catalogo_pero_las_rutas_protegidas_piden_entrar (web.pruebas.test_interfaz.AccesoPorRolTests) ... ok
+test_cliente_no_entra_al_panel_de_agente_y_agente_no_usa_el_carrito (web.pruebas.test_interfaz.AccesoPorRolTests) ... ok
+test_el_menu_muestra_solo_las_opciones_del_rol (web.pruebas.test_interfaz.AccesoPorRolTests) ... ok
+test_el_agente_ve_el_pedido_asociado_al_ticket (web.pruebas.test_interfaz.FlujoAgenteTests) ... ok
+test_el_segundo_agente_ve_el_aviso_de_ticket_ya_asignado (web.pruebas.test_interfaz.FlujoAgenteTests) ... ok
+test_agregar_cambiar_quitar_y_pagar_el_carrito (web.pruebas.test_interfaz.FlujoClienteTests) ... ok
+test_el_contenido_del_usuario_se_escapa (web.pruebas.test_interfaz.FlujoClienteTests) ... ok
+test_lo_ajeno_responde_404 (web.pruebas.test_interfaz.FlujoClienteTests) ... ok
+test_no_se_puede_radicar_pqr_sobre_pedido_ajeno (web.pruebas.test_interfaz.FlujoClienteTests) ... ok
+test_pagar_sin_stock_no_crea_pedido_y_conserva_el_carrito (web.pruebas.test_interfaz.FlujoClienteTests) ... ok
+test_radicar_pqr_sobre_mi_pedido_y_verla_en_mis_pqr (web.pruebas.test_interfaz.FlujoClienteTests) ... ok
+test_entrar_no_redirige_a_sitios_externos (web.pruebas.test_interfaz.SeguridadWebTests) ... ok
+test_los_formularios_exigen_csrf (web.pruebas.test_interfaz.SeguridadWebTests) ... ok
+test_registro_crea_cliente_y_entra (web.pruebas.test_interfaz.SeguridadWebTests) ... ok
+test_salir_solo_por_post (web.pruebas.test_interfaz.SeguridadWebTests) ... ok
+test_criterio3_dos_agentes_compiten_y_solo_uno_obtiene_el_ticket (soporte.pruebas.test_hu08_tomar_ticket.HU08ConcurrenciaTests) ... ok
+test_dos_cierres_simultaneos_solo_uno_tiene_exito (soporte.pruebas.test_seguridad_hu10.CambioDeEstadoConcurrenteTests) ... ok
+test_numero_tiene_formato_tck_con_cinco_digitos (soporte.pruebas.test_unitarias_soporte.TicketModeloTests) ... ok
+
+----------------------------------------------------------------------
+Ran 60 tests in 43.917s
+
+OK
+Destroying test database for alias 'default' ('test_ecommerce_db')...
+ OK
+System check identified no issues (0 silenced).
+
+    POST /api/tickets/29/tomar/ (agente1) -> 200 agente=agente1, estado=EN_PROCESO
+
+    POST /api/tickets/30/tomar/ (agente1) -> 200 agente=agente1, estado=EN_PROCESO
+
+    POST /api/tickets/30/tomar/ (agente2) -> 409 El ticket ya fue asignado
+
+    POST /api/tickets/9999/tomar/ (agente1) -> 404 El ticket 9999 no existe
+
+    agente1 -> 409 (rechazado)
+
+    agente2 -> 200 (exito)
+
+# ---- Quality gates del CI, ejecutados localmente ----
+### coverage report --fail-under=85
+exit=0
+TOTAL                          1463     98    93%
+
+### bandit -r tests --severity-level medium
+exit=0 (hallazgos medios o altos: 0)
+
+### pip-audit -r tests/requirements.txt
+No known vulnerabilities found
+
+### gitleaks git . --config .gitleaks.toml
+7:21PM INF no leaks found
+
+### makemigrations --check
+No changes detected
+
+### check --deploy (HTTPS=true, DEBUG=False)
+System check identified some issues:
+?: (security.W021) You have not set the SECURE_HSTS_PRELOAD setting to True. Without this, your site cannot be submitted to the browser preload list.
+System check identified 1 issue (0 silenced).

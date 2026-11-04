@@ -18,7 +18,7 @@ class CheckoutCasosBordeTests(TestCase):
         return self.client.post("/api/pedidos/", data=cuerpo, content_type="application/json")
 
     def checkout(self, items):
-        return self.post(json.dumps({"items": items}))
+        return self.post(json.dumps({"items": items, "envio": fabricas.ENVIO}))
 
     def test_el_mismo_producto_repetido_se_agrupa_en_un_solo_item(self):
         respuesta = self.checkout(

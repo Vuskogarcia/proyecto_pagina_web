@@ -1,6 +1,6 @@
 # Modelo de amenazas: SHOP-HUB
 
-Guía Módulo 7, semana 13, §5. Revisado el 2026-11-02 sobre la rama `feature/seguridad-e-interfaz`.
+Guía Módulo 7, semana 13, §5. Revisado el 2026-11-02 y actualizado el 2026-11-04 (HU-03, HU-04 criterio 3 y HU-10) sobre la rama `feature/seguridad-e-interfaz`.
 
 > No todos los riesgos se pueden eliminar: se gestionan según su impacto y su probabilidad. Este documento dice qué se controló, con qué evidencia y qué riesgo queda.
 
@@ -49,6 +49,9 @@ Impacto y probabilidad: **Alto / Medio / Bajo**. El riesgo residual es lo que qu
 | A9 | Configuración y secretos | Secretos expuestos | `SECRET_KEY` en el código o en Git (H11, H12), `.env` subido por error | **Alto** | Sin claves de respaldo; con `DEBUG=False` se rechaza una clave de ejemplo; `.env` en `.gitignore`; gitleaks en el CI | `ADL07*`, job `seguridad` del CI | **Medio**: las 2 claves viejas siguen en el historial (DT-13, decisión del equipo) |
 | A10 | Plataforma | Componentes vulnerables | Una versión de Django o psycopg2 con un CVE | **Medio** | `pip-audit` en el CI; bandit (SAST) | job `seguridad` del CI | **Bajo** |
 | A11 | Privilegios | Escalada de rol | Registrarse como agente; agente que entra a `/admin/` (H14) | **Alto** | El registro siempre crea un cliente (campo `rol` → 400); agente = grupo, sin `is_staff` | `test_registro_crea_cliente_y_no_permite_elegir_rol`, `H14*` | **Bajo** |
+| A12 | Datos de clientes | Exposición de datos de envío (dirección, teléfono) | IDOR sobre `/api/pedidos/<id>/`; datos personales copiados al registro de auditoría | **Alto** | Solo el dueño y los agentes ven el envío (404 al resto); la auditoría guarda el código del pedido, nunca la dirección ni el teléfono; validación con lista de permitidos | `test_seguridad_envio.py` | **Bajo** |
+| A13 | Pedidos e inventario | Manipulación del catálogo (precio o stock) | Cliente o agente que llama a `POST`/`PATCH /api/productos/`; asignación masiva (`id`, `creado_en`); precio negativo o NaN | **Alto** | Solo el superusuario (verificado en la vista y en el servicio); campos permitidos; `dinero()` y `entero(minimo=0)`; bloqueo de fila al editar; el precio de los pedidos pagados no cambia (`precio_pactado`); auditoría | `test_seguridad_hu03.py` | **Bajo** |
+| A14 | Atención de tickets | Respuesta o cierre por quien no corresponde; saltar estados | Agente no asignado o cliente llamando a `/respuestas/` o `/estado/`; cerrar sin resolver; dos cierres a la vez | **Medio** | Solo el agente asignado (403); transiciones permitidas (409); `select_for_update`; XSS escapado; auditoría de cada respuesta y cambio de estado | `test_seguridad_hu10.py` (incluye concurrencia en PostgreSQL) | **Bajo** |
 
 ## 4. OWASP Top 10 (2021): cómo queda el proyecto
 

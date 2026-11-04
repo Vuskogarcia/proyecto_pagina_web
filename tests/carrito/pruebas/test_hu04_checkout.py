@@ -18,11 +18,10 @@ class HU04CheckoutTests(TestCase):
         # HU-01: el pedido queda a nombre del usuario en sesión (ADL-01).
         self.client.force_login(self.cliente)
 
-    def checkout(self, items, cliente_http=None):
+    def checkout(self, items, cliente_http=None, envio=fabricas.ENVIO):
+        cuerpo = {"items": items} if envio is None else {"items": items, "envio": envio}
         return (cliente_http or self.client).post(
-            "/api/pedidos/",
-            data=json.dumps({"items": items}),
-            content_type="application/json",
+            "/api/pedidos/", data=json.dumps(cuerpo), content_type="application/json"
         )
 
     def test_criterio2_calcula_el_total_y_descuenta_el_stock(self):
@@ -43,6 +42,7 @@ class HU04CheckoutTests(TestCase):
         segundo = self.checkout([{"id_producto": self.mouse.pk, "cantidad": 2}]).json()
 
         self.assertRegex(primero["codigo"], r"^PED-\d{5}$")
+        self.assertEqual(primero["envio"], fabricas.ENVIO)  # criterio 3: datos de envío guardados
         self.assertNotEqual(primero["codigo"], segundo["codigo"])
         self.assertEqual(primero["estado"], "CONFIRMADO")
         # El pedido creado se puede consultar por su id.
@@ -52,6 +52,10 @@ class HU04CheckoutTests(TestCase):
         self.assertEqual(detalle.json()["items"][0]["cantidad"], 2)
 
     def test_criterio3_datos_invalidos_o_sin_stock_no_crean_el_pedido(self):
+        # Criterio 3: el cliente debe ingresar los datos de envío (400 si faltan).
+        item = [{"id_producto": self.teclado.pk, "cantidad": 1}]
+        self.assertEqual(self.checkout(item, envio=None).status_code, 400)
+        self.assertEqual(self.checkout(item, envio={**fabricas.ENVIO, "direccion": "  "}).status_code, 400)
         # Datos incompletos o mal formados: 400.
         self.assertEqual(self.checkout([]).status_code, 400)
         self.assertEqual(

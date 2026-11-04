@@ -10,9 +10,10 @@ from comun.validaciones import entero, texto, texto_seguro
 from cuentas import auditoria
 from cuentas.models import EventoAuditoria
 
-from .models import RegistroAsignacion, TicketSoporte
+from .models import RegistroAsignacion, RespuestaTicket, TicketSoporte
 
 MAX_DESCRIPCION = 5000
+MAX_RESPUESTA = 5000
 MAX_ASUNTO = 200
 
 
@@ -29,7 +30,7 @@ def crear_ticket(cliente_id, descripcion, pedido_id=None, asunto="", tipo=None):
     tipos_validos = {valor for valor, _ in TicketSoporte.TIPOS}
     if tipo is None:
         tipo = TicketSoporte.PETICION
-    elif tipo not in tipos_validos:  # lista de permitidos (ADL-04)
+    elif not isinstance(tipo, str) or tipo not in tipos_validos:  # lista de permitidos (ADL-04)
         raise DatosInvalidos(f"El tipo debe ser uno de: {', '.join(sorted(tipos_validos))}")
     pedido_id = entero(pedido_id, "id_pedido", obligatorio=False)
     descripcion = texto(descripcion, "descripcion", maximo=MAX_DESCRIPCION)
@@ -128,3 +129,68 @@ def asignados_a(agente):
         .select_related("cliente", "pedido", "agente")
         .order_by("estado", "-creado_en")
     )
+
+
+
+def _ticket_del_agente(ticket_id, agente_id):
+    """Bloquea el ticket y verifica que lo tenga asignado ESTE agente.
+
+    HU-10 criterio 1: solo el agente asignado puede responder o cambiar el
+    estado. select_for_update evita que dos cambios simultáneos se pisen.
+    """
+    agente = _usuario(entero(agente_id, "id_agente"), "agente")
+    if not es_agente(agente):
+        raise SinPermiso("Solo un agente de soporte puede atender tickets")
+    ticket_id = entero(ticket_id, "id_ticket")
+    try:
+        ticket = TicketSoporte.objects.select_for_update().get(pk=ticket_id)
+    except TicketSoporte.DoesNotExist:
+        raise NoEncontrado(f"El ticket {ticket_id} no existe")
+    if ticket.agente_id != agente.pk:
+        raise SinPermiso("Solo el agente asignado puede atender este ticket")
+    return ticket, agente
+
+
+@transaction.atomic
+def responder_ticket(ticket_id, agente_id, mensaje):
+    """HU-10 criterio 2: la respuesta queda registrada con fecha y autor."""
+    mensaje = texto(mensaje, "mensaje", maximo=MAX_RESPUESTA)
+    ticket, agente = _ticket_del_agente(ticket_id, agente_id)
+    if ticket.estado == TicketSoporte.CERRADO:
+        raise EstadoInvalido("El ticket está cerrado: ya no admite respuestas")
+    respuesta = RespuestaTicket.objects.create(ticket=ticket, autor=agente, mensaje=mensaje)
+    auditoria.registrar(EventoAuditoria.TICKET_RESPONDIDO, usuario=agente, detalle=ticket.numero)
+    return respuesta
+
+
+@transaction.atomic
+def cambiar_estado(ticket_id, agente_id, nuevo_estado):
+    """HU-10 criterio 3: En proceso -> Resuelto -> Cerrado (y reabrir).
+
+    Solo se permiten las transiciones de TicketSoporte.TRANSICIONES: un
+    estado desconocido es 400; uno no permitido desde el actual, 409.
+    """
+    validos = {valor for valor, _ in TicketSoporte.ESTADOS}
+    if not isinstance(nuevo_estado, str) or nuevo_estado not in validos:
+        raise DatosInvalidos(f"El estado debe ser uno de: {', '.join(sorted(validos))}")
+    ticket, agente = _ticket_del_agente(ticket_id, agente_id)
+    permitidos = TicketSoporte.TRANSICIONES.get(ticket.estado, set())
+    if nuevo_estado not in permitidos:
+        raise EstadoInvalido(
+            f"No se puede pasar de {ticket.get_estado_display()} a "
+            f"{dict(TicketSoporte.ESTADOS)[nuevo_estado]}"
+        )
+    anterior = ticket.estado
+    ticket.estado = nuevo_estado
+    ticket.save(update_fields=["estado"])
+    auditoria.registrar(EventoAuditoria.TICKET_ESTADO, usuario=agente,
+                        detalle=f"{ticket.numero} {anterior} -> {nuevo_estado}")
+    return ticket
+
+
+def estados_siguientes(ticket):
+    """Estados a los que el agente asignado puede mover el ticket (para la web)."""
+    nombres = dict(TicketSoporte.ESTADOS)
+    return [(e, nombres[e]) for e in (TicketSoporte.EN_PROCESO, TicketSoporte.RESUELTO,
+                                      TicketSoporte.CERRADO)
+            if e in TicketSoporte.TRANSICIONES.get(ticket.estado, set())]

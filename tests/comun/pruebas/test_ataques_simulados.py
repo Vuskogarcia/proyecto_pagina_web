@@ -15,6 +15,7 @@ docs/seguridad/semana-13.md para la evidencia ejecutada.
 """
 
 import json
+import os
 import re
 from pathlib import Path
 from unittest import mock
@@ -77,13 +78,18 @@ class InyeccionSqlTests(TestCase):
 
         Si alguien agrega SQL crudo, esta prueba falla y obliga a revisarlo."""
         prohibido = re.compile(r"\.raw\(|\.extra\(|cursor\(\)|RawSQL\(")
-        hallazgos = [
-            f"{ruta.relative_to(DIR_PROYECTO)}:{numero}"
-            for ruta in DIR_PROYECTO.rglob("*.py")
-            if not {"venv", ".venv", "migrations", "pruebas", "staticfiles"} & set(ruta.parts)
-            for numero, linea in enumerate(ruta.read_text(encoding="utf-8").splitlines(), 1)
-            if prohibido.search(linea)
-        ]
+        excluidas = {"venv", ".venv", "migrations", "pruebas", "staticfiles", "__pycache__", ".git"}
+        hallazgos = []
+        # os.walk podando carpetas: no recorre el venv (miles de archivos).
+        for raiz, carpetas, archivos in os.walk(DIR_PROYECTO):
+            carpetas[:] = [c for c in carpetas if c not in excluidas]
+            for nombre in archivos:
+                if not nombre.endswith(".py"):
+                    continue
+                ruta = Path(raiz) / nombre
+                for numero, linea in enumerate(ruta.read_text(encoding="utf-8").splitlines(), 1):
+                    if prohibido.search(linea):
+                        hallazgos.append(f"{ruta.relative_to(DIR_PROYECTO)}:{numero}")
         self.assertEqual(hallazgos, [])
 
 

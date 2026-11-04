@@ -24,6 +24,11 @@ def es_agente(usuario):
     return usuario._es_agente
 
 
+def es_administrador(usuario):
+    """Administrador = superusuario de Django (HU-01 criterio 2, HU-03)."""
+    return bool(getattr(usuario, "is_authenticated", False) and usuario.is_superuser)
+
+
 def rol(usuario):
     if getattr(usuario, "is_superuser", False):
         return ADMINISTRADOR

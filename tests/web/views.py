@@ -25,13 +25,13 @@ from carrito import servicios as pedidos
 from catalogo import servicios as catalogo
 from comun.excepciones import DemasiadosIntentos, ErrorDeNegocio, EstadoInvalido, NoEncontrado
 from comun.limites import limite_escritura, limite_registro
-from comun.roles import es_agente
+from comun.roles import es_administrador, es_agente
 from cuentas import auditoria
 from cuentas import servicios as cuentas
 from cuentas.models import EventoAuditoria
 from soporte import servicios as soporte
 
-from .formularios import EntrarForm, PqrForm, RegistroForm
+from .formularios import EntrarForm, EnvioForm, PqrForm, ProductoForm, RegistroForm
 
 logger = logging.getLogger("shophub")
 
@@ -63,6 +63,7 @@ def _solo(condicion):
 
 solo_clientes = _solo(lambda u: not es_agente(u))
 solo_agentes = _solo(es_agente)
+solo_administradores = _solo(es_administrador)
 autenticado = _solo(lambda u: True)
 
 
@@ -196,15 +197,24 @@ def carrito_quitar(request):
 
 
 @solo_clientes
-@require_POST
+@require_http_methods(["GET", "POST"])
 def carrito_pagar(request):
-    try:
-        pedido = carrito_sesion.pagar(request.session, request.user)
-    except ErrorDeNegocio as error:
-        messages.error(request, f"No se pudo completar el pago: {error}")
+    """HU-04 criterio 3: antes de pagar, el cliente ingresa los datos de envío."""
+    resumen = carrito_sesion.resumen(request.session)
+    if not resumen["lineas"]:
+        messages.info(request, "Tu carrito está vacío.")
         return redirect("web:carrito")
-    messages.success(request, f"¡Listo! Tu pedido {pedido.codigo} quedó confirmado.")
-    return redirect("web:pedido", pedido_id=pedido.pk)
+    inicial = {"nombre": request.user.get_full_name()}
+    formulario = EnvioForm(request.POST or None, initial=inicial)
+    if request.method == "POST" and formulario.is_valid():
+        try:
+            pedido = carrito_sesion.pagar(request.session, request.user, formulario.cleaned_data)
+        except ErrorDeNegocio as error:
+            formulario.add_error(None, f"No se pudo completar el pago: {error}")
+        else:
+            messages.success(request, f"¡Listo! Tu pedido {pedido.codigo} quedó confirmado.")
+            return redirect("web:pedido", pedido_id=pedido.pk)
+    return render(request, "web/pagar.html", {"form": formulario, **resumen})
 
 
 @solo_clientes
@@ -253,7 +263,13 @@ def nueva_pqr(request):
 @require_GET
 def pqr(request, ticket_id):
     ticket = _obtener_o_404(soporte.ticket_visible_para, ticket_id, request.user)
-    return render(request, "web/pqr_detalle.html", {"ticket": ticket})
+    asignado_a_mi = ticket.agente_id == request.user.pk
+    return render(request, "web/pqr_detalle.html", {
+        "ticket": ticket,
+        "respuestas": ticket.respuestas.select_related("autor"),
+        "asignado_a_mi": asignado_a_mi,
+        "estados_siguientes": soporte.estados_siguientes(ticket) if asignado_a_mi else [],
+    })
 
 
 # --- Panel del agente (HU-07, HU-08, HU-09) -------------------------------
@@ -284,6 +300,101 @@ def tomar(request, ticket_id):
 
 
 @solo_agentes
+@require_POST
+def responder(request, ticket_id):
+    """HU-10: el agente asignado responde la PQR."""
+    try:
+        soporte.responder_ticket(ticket_id, request.user.pk, request.POST.get("mensaje"))
+    except NoEncontrado:
+        raise Http404
+    except ErrorDeNegocio as error:
+        messages.error(request, f"No se pudo enviar la respuesta: {error}")
+    else:
+        messages.success(request, "Respuesta enviada. El cliente ya puede verla.")
+    return redirect("web:pqr", ticket_id=ticket_id)
+
+
+@solo_agentes
+@require_POST
+def cambiar_estado(request, ticket_id):
+    """HU-10: el agente asignado cambia el estado (Resuelto, Cerrado, reabrir)."""
+    try:
+        ticket = soporte.cambiar_estado(ticket_id, request.user.pk, request.POST.get("estado"))
+    except NoEncontrado:
+        raise Http404
+    except ErrorDeNegocio as error:
+        messages.error(request, f"No se pudo cambiar el estado: {error}")
+    else:
+        messages.success(request, f"{ticket.numero} quedó en estado «{ticket.get_estado_display()}».")
+    return redirect("web:pqr", ticket_id=ticket_id)
+
+
+@solo_agentes
 @require_GET
 def mis_asignados(request):
     return render(request, "web/agente_asignados.html", {"tickets": soporte.asignados_a(request.user)})
+
+
+
+# --- Gestión del catálogo (HU-03, solo administradores) -------------------
+
+@solo_administradores
+@require_GET
+def gestion_productos(request):
+    return render(request, "web/gestion_productos.html",
+                  {"productos": catalogo.listar_todos(request.user)})
+
+
+@solo_administradores
+@require_http_methods(["GET", "POST"])
+def gestion_producto_nuevo(request):
+    formulario = ProductoForm(request.POST or None, initial={"activo": True, "stock": 0})
+    if request.method == "POST" and formulario.is_valid():
+        try:
+            producto = catalogo.crear_producto(request.user, formulario.cleaned_data)
+        except ErrorDeNegocio as error:
+            formulario.add_error(None, str(error))
+        else:
+            messages.success(request, f"Producto «{producto.nombre}» creado.")
+            return redirect("web:gestion_productos")
+    return render(request, "web/gestion_producto_form.html", {"form": formulario, "producto": None})
+
+
+@solo_administradores
+@require_http_methods(["GET", "POST"])
+def gestion_producto_editar(request, producto_id):
+    producto = _obtener_o_404(catalogo.producto_para_editar, request.user, producto_id)
+    inicial = {c: getattr(producto, c) for c in catalogo.CAMPOS_EDITABLES}
+    formulario = ProductoForm(request.POST or None, initial=inicial)
+    if request.method == "POST" and formulario.is_valid():
+        cambios = {c: v for c, v in formulario.cleaned_data.items() if v != inicial[c]}
+        if not cambios:
+            messages.info(request, "No hubo cambios.")
+            return redirect("web:gestion_productos")
+        try:
+            producto = catalogo.actualizar_producto(request.user, producto_id, cambios)
+        except NoEncontrado:
+            raise Http404
+        except ErrorDeNegocio as error:
+            formulario.add_error(None, str(error))
+        else:
+            messages.success(request, f"Producto «{producto.nombre}» actualizado.")
+            return redirect("web:gestion_productos")
+    return render(request, "web/gestion_producto_form.html", {"form": formulario, "producto": producto})
+
+
+@solo_administradores
+@require_POST
+def gestion_producto_activo(request, producto_id):
+    """Activa o desactiva un producto (HU-03 criterio 3)."""
+    activar = request.POST.get("activo") == "1"
+    try:
+        producto = catalogo.actualizar_producto(request.user, producto_id, {"activo": activar})
+    except NoEncontrado:
+        raise Http404
+    except ErrorDeNegocio as error:
+        messages.error(request, str(error))
+    else:
+        estado = "visible en el catálogo" if producto.activo else "retirado del catálogo"
+        messages.success(request, f"«{producto.nombre}» quedó {estado}.")
+    return redirect("web:gestion_productos")

@@ -64,7 +64,7 @@ class FlujoClienteTests(TestCase):
         self.assertContains(carrito, "$300.000")  # 2 x 150.000
         self.assertNotContains(carrito, "Mouse")
 
-        respuesta = self.client.post("/carrito/pagar/")
+        respuesta = self.client.post("/carrito/pagar/", fabricas.ENVIO)
         pedido = Pedido.objects.get()
         self.assertRedirects(respuesta, f"/pedidos/{pedido.pk}/")
         self.assertEqual(pedido.cliente, self.cliente)
@@ -77,7 +77,7 @@ class FlujoClienteTests(TestCase):
         self.teclado.stock = 1
         self.teclado.save()
 
-        respuesta = self.client.post("/carrito/pagar/", follow=True)
+        respuesta = self.client.post("/carrito/pagar/", fabricas.ENVIO, follow=True)
         self.assertContains(respuesta, "Stock insuficiente")
         self.assertFalse(Pedido.objects.exists())
         self.assertContains(self.client.get("/carrito/"), "Teclado")

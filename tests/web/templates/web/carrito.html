@@ -39,11 +39,8 @@
   <aside class="tarjeta resumen" aria-label="Resumen de compra">
     <h2>Resumen</h2>
     <p class="resumen__total"><span>Total</span> <strong>{{ total|pesos }}</strong></p>
-    <form method="post" action="{% url 'web:carrito_pagar' %}">
-      {% csrf_token %}
-      <button class="boton boton--accion boton--ancho" type="submit">Pagar</button>
-    </form>
-    <p class="ayuda">El precio y el stock se confirman al pagar.</p>
+    <a class="boton boton--accion boton--ancho" href="{% url 'web:carrito_pagar' %}">Continuar al pago</a>
+    <p class="ayuda">En el siguiente paso ingresas los datos de envío. El precio y el stock se confirman al pagar.</p>
     <a href="{% url 'web:inicio' %}">Seguir comprando</a>
   </aside>
 </div>

@@ -41,7 +41,7 @@ class ADL01IdentidadDesdeLaSesionTests(TestCase):
 
     def test_sin_sesion_la_api_protegida_responde_401_y_no_cambia_nada(self):
         items = [{"id_producto": self.producto.pk, "cantidad": 1}]
-        self.assertEqual(post_json(self.client, "/api/pedidos/", {"items": items}).status_code, 401)
+        self.assertEqual(post_json(self.client, "/api/pedidos/", {"items": items, "envio": fabricas.ENVIO}).status_code, 401)
         self.assertEqual(
             post_json(self.client, "/api/tickets/", {"descripcion": "x"}).status_code, 401
         )
@@ -59,7 +59,7 @@ class ADL01IdentidadDesdeLaSesionTests(TestCase):
         self.client.force_login(self.atacante)
         items = [{"id_producto": self.producto.pk, "cantidad": 1}]
 
-        r1 = post_json(self.client, "/api/pedidos/", {"id_cliente": self.victima.pk, "items": items})
+        r1 = post_json(self.client, "/api/pedidos/", {"id_cliente": self.victima.pk, "items": items, "envio": fabricas.ENVIO})
         r2 = post_json(
             self.client, "/api/tickets/", {"id_cliente": self.victima.pk, "descripcion": "x"}
         )
@@ -73,7 +73,7 @@ class ADL01IdentidadDesdeLaSesionTests(TestCase):
         self.client.force_login(self.atacante)
         items = [{"id_producto": self.producto.pk, "cantidad": 2}]
 
-        pedido = post_json(self.client, "/api/pedidos/", {"items": items})
+        pedido = post_json(self.client, "/api/pedidos/", {"items": items, "envio": fabricas.ENVIO})
         ticket = post_json(self.client, "/api/tickets/", {"descripcion": "Llegó roto"})
 
         self.assertEqual(pedido.status_code, 201)
@@ -162,7 +162,7 @@ class ADL04ValidacionConListaDePermitidosYCotasTests(TestCase):
         return post_json(
             self.client,
             "/api/pedidos/",
-            {"items": [{"id_producto": id_producto, "cantidad": cantidad}]},
+            {"items": [{"id_producto": id_producto, "cantidad": cantidad}], "envio": fabricas.ENVIO},
         )
 
     def test_valores_fuera_de_la_lista_de_permitidos_responden_400(self):
@@ -186,7 +186,7 @@ class ADL04ValidacionConListaDePermitidosYCotasTests(TestCase):
         respuesta = post_json(
             self.client,
             "/api/pedidos/",
-            {"items": [{"id_producto": self.producto.pk, "cantidad": 1}], "precio": "1"},
+            {"items": [{"id_producto": self.producto.pk, "cantidad": 1}], "envio": fabricas.ENVIO, "precio": "1"},
         )
         self.assertEqual(respuesta.status_code, 400)
         self.assertFalse(Pedido.objects.exists())

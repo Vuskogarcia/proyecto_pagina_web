@@ -10,12 +10,21 @@ class TicketSoporte(models.Model):
 
     ABIERTO = "ABIERTO"
     EN_PROCESO = "EN_PROCESO"
+    RESUELTO = "RESUELTO"
     CERRADO = "CERRADO"
     ESTADOS = [
         (ABIERTO, "Abierto"),
         (EN_PROCESO, "En proceso"),
+        (RESUELTO, "Resuelto"),
         (CERRADO, "Cerrado"),
     ]
+    # Cambios de estado que puede hacer el agente asignado (HU-10 criterio 3).
+    # ABIERTO -> EN_PROCESO ocurre al tomar el ticket (HU-08). CERRADO es final.
+    # RESUELTO -> EN_PROCESO permite reabrir si el problema sigue.
+    TRANSICIONES = {
+        EN_PROCESO: {RESUELTO},
+        RESUELTO: {CERRADO, EN_PROCESO},
+    }
 
     # Tipo de PQR (petición, queja o reclamo), como se radica en la interfaz.
     PETICION = "PETICION"
@@ -73,3 +82,21 @@ class RegistroAsignacion(models.Model):
 
     def __str__(self):
         return f"{self.ticket.numero} → {self.agente} ({self.asignado_en})"
+
+
+class RespuestaTicket(models.Model):
+    """Respuesta del agente asignado a un ticket (HU-10 criterio 2): queda
+    registrada con fecha y autor, y el cliente la ve (criterio 4)."""
+
+    ticket = models.ForeignKey(
+        TicketSoporte, on_delete=models.CASCADE, related_name="respuestas"
+    )
+    autor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT)
+    mensaje = models.TextField()
+    creado_en = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["creado_en", "id"]
+
+    def __str__(self):
+        return f"{self.ticket.numero} · {self.autor} · {self.creado_en:%Y-%m-%d %H:%M}"

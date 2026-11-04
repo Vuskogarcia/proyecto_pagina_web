@@ -27,4 +27,13 @@ urlpatterns = [
     path("agente/", views.cola, name="cola"),
     path("agente/tickets/<id:ticket_id>/tomar/", views.tomar, name="tomar"),
     path("agente/mis-tickets/", views.mis_asignados, name="asignados"),
+    # Gestión del catálogo (HU-03, administrador)
+    path("gestion/productos/", views.gestion_productos, name="gestion_productos"),
+    path("gestion/productos/nuevo/", views.gestion_producto_nuevo, name="gestion_producto_nuevo"),
+    path("gestion/productos/<id:producto_id>/", views.gestion_producto_editar, name="gestion_producto_editar"),
+    path("gestion/productos/<id:producto_id>/activo/", views.gestion_producto_activo,
+         name="gestion_producto_activo"),
+    # Responder y cambiar estado (HU-10)
+    path("agente/tickets/<id:ticket_id>/responder/", views.responder, name="responder"),
+    path("agente/tickets/<id:ticket_id>/estado/", views.cambiar_estado, name="cambiar_estado"),
 ]

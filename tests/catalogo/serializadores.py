@@ -5,6 +5,11 @@ Separado de servicios.py para que el servicio solo tenga reglas de negocio
 """
 
 
+def a_dict_admin(producto):
+    """Vista del administrador: incluye si el producto está activo."""
+    return {**a_dict(producto), "activo": producto.activo}
+
+
 def a_dict(producto):
     return {
         "id": producto.pk,

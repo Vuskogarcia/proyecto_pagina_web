@@ -11,7 +11,7 @@ from django.views.decorators.http import require_http_methods
 
 from .excepciones import DatosInvalidos, ErrorDeNegocio, NoAutenticado, SinPermiso
 from .limites import limite_escritura
-from .roles import es_agente
+from .roles import es_administrador, es_agente
 from .validaciones import texto_seguro
 
 logger = logging.getLogger("shophub")
@@ -19,6 +19,7 @@ logger = logging.getLogger("shophub")
 PUBLICO = "publico"
 AUTENTICADO = "autenticado"
 AGENTE = "agente"
+ADMINISTRADOR = "administrador"
 
 
 def api(*metodos, acceso=AUTENTICADO):
@@ -44,6 +45,8 @@ def api(*metodos, acceso=AUTENTICADO):
                     raise NoAutenticado("Debes iniciar sesión")
                 if acceso == AGENTE and not es_agente(request.user):
                     raise SinPermiso("Solo un agente de soporte puede hacer esto")
+                if acceso == ADMINISTRADOR and not es_administrador(request.user):
+                    raise SinPermiso("Solo un administrador puede hacer esto")
                 if request.method != "GET" and request.user.is_authenticated:
                     limite_escritura(request)
                 return vista(request, *args, **kwargs)

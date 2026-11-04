@@ -40,8 +40,25 @@ def cola_sin_asignar(request):
 
 @api("GET")
 def ver_ticket(request, ticket_id):
+    """HU-05/HU-06/HU-10: el ticket con su historial de respuestas."""
     ticket = servicios.ticket_visible_para(ticket_id, request.user)
-    return JsonResponse(serializadores.a_dict(ticket))
+    return JsonResponse(serializadores.a_dict(ticket, con_respuestas=True))
+
+
+@api("POST", acceso=AGENTE)
+def responder(request, ticket_id):
+    """HU-10 criterio 2: el agente asignado responde el ticket."""
+    datos = leer_json(request, permitidos=["mensaje"])
+    respuesta = servicios.responder_ticket(ticket_id, request.user.pk, datos.get("mensaje"))
+    return JsonResponse(serializadores.respuesta_a_dict(respuesta), status=201)
+
+
+@api("POST", acceso=AGENTE)
+def cambiar_estado(request, ticket_id):
+    """HU-10 criterio 3: el agente asignado cambia el estado del ticket."""
+    datos = leer_json(request, permitidos=["estado"])
+    ticket = servicios.cambiar_estado(ticket_id, request.user.pk, datos.get("estado"))
+    return JsonResponse(serializadores.a_dict(ticket, con_respuestas=True))
 
 
 @api("POST")

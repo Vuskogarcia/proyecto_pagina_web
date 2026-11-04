@@ -1,0 +1,18 @@
+{% extends "web/base.html" %}
+{% block titulo %}{% if producto %}Editar {{ producto.nombre }}{% else %}Nuevo producto{% endif %}{% endblock %}
+{% block contenido %}
+<p class="migas"><a href="{% url 'web:gestion_productos' %}">Gestión de catálogo</a> / {% if producto %}{{ producto.nombre }}{% else %}Nuevo{% endif %}</p>
+<section class="tarjeta formulario-medio">
+  <h1>{% if producto %}Editar producto{% else %}Nuevo producto{% endif %}</h1>
+  <form method="post">
+    {% csrf_token %}
+    {% include "web/_errores_form.html" %}
+    {% include "web/_campo.html" with campo=form.nombre %}
+    {% include "web/_campo.html" with campo=form.descripcion %}
+    {% include "web/_campo.html" with campo=form.precio %}
+    {% include "web/_campo.html" with campo=form.stock %}
+    <div class="grupo grupo--casilla">{{ form.activo }} <label for="{{ form.activo.id_for_label }}">{{ form.activo.label }}</label></div>
+    <button class="boton boton--accion" type="submit">{% if producto %}Guardar cambios{% else %}Crear producto{% endif %}</button>
+  </form>
+</section>
+{% endblock %}

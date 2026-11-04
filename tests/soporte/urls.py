@@ -7,4 +7,6 @@ urlpatterns = [
     path("tickets/cola/", views.cola_sin_asignar, name="cola_sin_asignar"),
     path("tickets/<id:ticket_id>/", views.ver_ticket, name="ver_ticket"),
     path("tickets/<id:ticket_id>/tomar/", views.tomar_ticket, name="tomar_ticket"),
+    path("tickets/<id:ticket_id>/respuestas/", views.responder, name="responder_ticket"),
+    path("tickets/<id:ticket_id>/estado/", views.cambiar_estado, name="cambiar_estado"),
 ]

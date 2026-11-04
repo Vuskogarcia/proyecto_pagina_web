@@ -9,6 +9,7 @@ ASCII) y con cota superior. ADL-05: texto sin NUL ni surrogates sueltos.
 """
 
 import re
+from decimal import Decimal, InvalidOperation
 
 from .excepciones import DatosInvalidos
 
@@ -19,8 +20,8 @@ MAX_ENTERO = 2_147_483_647
 _SOLO_DIGITOS = re.compile(r"-?[0-9]{1,19}")  # ASCII, sin espacios ni signos raros
 
 
-def entero(valor, campo, obligatorio=True, maximo=MAX_ENTERO):
-    """Convierte `valor` a entero en [1, maximo] o lanza DatosInvalidos.
+def entero(valor, campo, obligatorio=True, maximo=MAX_ENTERO, minimo=1):
+    """Convierte `valor` a entero en [minimo, maximo] o lanza DatosInvalidos.
 
     Lista de permitidos: un `int` (no bool) o un texto de dígitos ASCII.
     Se rechazan floats (1.9 se truncaba a 1), dígitos no ASCII ("١"),
@@ -38,8 +39,10 @@ def entero(valor, campo, obligatorio=True, maximo=MAX_ENTERO):
         numero = int(valor)
     else:
         raise DatosInvalidos(f"El campo '{campo}' debe ser un número entero")
-    if numero < 1:
-        raise DatosInvalidos(f"El campo '{campo}' debe ser mayor que 0")
+    if numero < minimo:
+        if minimo == 1:
+            raise DatosInvalidos(f"El campo '{campo}' debe ser mayor que 0")
+        raise DatosInvalidos(f"El campo '{campo}' no puede ser menor que {minimo}")
     if numero > maximo:
         raise DatosInvalidos(f"El campo '{campo}' no puede ser mayor que {maximo}")
     return numero
@@ -71,4 +74,49 @@ def texto(valor, campo, obligatorio=True, maximo=None):
     valor = texto_seguro(valor.strip(), campo)
     if maximo is not None and len(valor) > maximo:
         raise DatosInvalidos(f"El campo '{campo}' admite máximo {maximo} caracteres")
+    return valor
+
+
+_DECIMAL = re.compile(r"[0-9]{1,10}(\.[0-9]{1,2})?")
+
+
+def dinero(valor, campo, maximo=Decimal("9999999999.99")):
+    """Precio positivo con máximo 2 decimales (HU-03).
+
+    Lista de permitidos: int, float con 2 decimales como máximo, o texto
+    "150000" / "150000.50" (dígitos ASCII). Se rechazan negativos, cero,
+    notación científica, NaN/Infinity y más de 2 decimales.
+    """
+    if valor is None:
+        raise DatosInvalidos(f"El campo '{campo}' es obligatorio")
+    if isinstance(valor, bool):
+        raise DatosInvalidos(f"El campo '{campo}' debe ser un número")
+    if isinstance(valor, Decimal):  # ya validado por un formulario de Django
+        numero = valor
+        if not numero.is_finite() or numero.as_tuple().exponent < -2:
+            raise DatosInvalidos(f"El campo '{campo}' admite máximo 2 decimales")
+    elif isinstance(valor, int):
+        numero = Decimal(valor)
+    elif isinstance(valor, float):
+        try:
+            numero = Decimal(repr(valor))
+        except InvalidOperation:
+            raise DatosInvalidos(f"El campo '{campo}' debe ser un número")
+        if not numero.is_finite() or numero.as_tuple().exponent < -2:
+            raise DatosInvalidos(f"El campo '{campo}' admite máximo 2 decimales")
+    elif isinstance(valor, str) and _DECIMAL.fullmatch(valor):
+        numero = Decimal(valor)
+    else:
+        raise DatosInvalidos(f"El campo '{campo}' debe ser un número con máximo 2 decimales")
+    if numero <= 0:
+        raise DatosInvalidos(f"El campo '{campo}' debe ser mayor que 0")
+    if numero > maximo:
+        raise DatosInvalidos(f"El campo '{campo}' no puede ser mayor que {maximo}")
+    return numero.quantize(Decimal("0.01"))
+
+
+def booleano(valor, campo):
+    """Solo true/false de JSON: "no", 0 o "false" como texto no cuentan."""
+    if not isinstance(valor, bool):
+        raise DatosInvalidos(f"El campo '{campo}' debe ser true o false")
     return valor

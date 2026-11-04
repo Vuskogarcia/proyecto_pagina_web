@@ -28,7 +28,10 @@
             <a href="{% url 'web:pqr_lista' %}" {% if request.resolver_match.url_name == 'pqr_lista' %}aria-current="page"{% endif %}>Mis PQR</a>
           {% endif %}
         {% endif %}
-        {% if user.is_superuser %}<a href="{% url 'admin:index' %}">Administración</a>{% endif %}
+        {% if user.is_superuser %}
+          <a href="{% url 'web:gestion_productos' %}" {% if request.resolver_match.url_name|slice:":7" == "gestion" %}aria-current="page"{% endif %}>Gestión de catálogo</a>
+          <a href="{% url 'admin:index' %}">Administración</a>
+        {% endif %}
       </nav>
 
       <div class="cuenta">

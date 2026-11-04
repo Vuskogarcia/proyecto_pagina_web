@@ -40,7 +40,7 @@ class RegistroDeEventosCriticosTests(TestCase):
     def test_operaciones_de_negocio_y_conflicto_409_quedan_registradas(self):
         producto = fabricas.producto(stock=5)
         self.client.force_login(self.cliente)
-        post_json(self.client, "/api/pedidos/", {"items": [{"id_producto": producto.pk, "cantidad": 1}]})
+        post_json(self.client, "/api/pedidos/", {"items": [{"id_producto": producto.pk, "cantidad": 1}], "envio": fabricas.ENVIO})
         post_json(self.client, "/api/tickets/", {"descripcion": "No llegó"})
         ticket = TicketSoporte.objects.get()
         for agente in (fabricas.agente("agente1"), fabricas.agente("agente2")):
@@ -66,7 +66,7 @@ class RegistroDeEventosCriticosTests(TestCase):
         # Sin stock: el checkout se revierte completo, incluido su evento.
         producto = fabricas.producto(stock=0)
         self.client.force_login(self.cliente)
-        respuesta = post_json(self.client, "/api/pedidos/", {"items": [{"id_producto": producto.pk, "cantidad": 1}]})
+        respuesta = post_json(self.client, "/api/pedidos/", {"items": [{"id_producto": producto.pk, "cantidad": 1}], "envio": fabricas.ENVIO})
         self.assertEqual(respuesta.status_code, 409)
         self.assertFalse(E.objects.filter(tipo=E.PEDIDO_CREADO).exists())
 

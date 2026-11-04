@@ -14,8 +14,8 @@ from . import serializadores, servicios
 def pedidos(request):
     """GET: mis pedidos. POST: checkout a nombre del usuario en sesión."""
     if request.method == "POST":
-        datos = leer_json(request, permitidos=["items"])
-        pedido = servicios.realizar_checkout(request.user.pk, datos.get("items"))
+        datos = leer_json(request, permitidos=["items", "envio"])
+        pedido = servicios.realizar_checkout(request.user.pk, datos.get("items"), datos.get("envio"))
         return JsonResponse(serializadores.a_dict(pedido), status=201)
     lista = [serializadores.a_dict(p) for p in servicios.pedidos_de(request.user)]
     return JsonResponse({"pedidos": lista})

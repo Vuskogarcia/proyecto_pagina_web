@@ -46,7 +46,7 @@ class RealizarCheckoutServicioTests(TestCase):
 
     def test_crea_el_pedido_con_el_precio_del_momento(self):
         pedido = servicios.realizar_checkout(
-            self.cliente.pk, [{"id_producto": self.teclado.pk, "cantidad": 2}]
+            self.cliente.pk, [{"id_producto": self.teclado.pk, "cantidad": 2}], fabricas.ENVIO
         )
         self.assertEqual(pedido.total(), Decimal("200"))
         self.assertEqual(pedido.items.get().precio_pactado, Decimal("100"))
@@ -54,9 +54,11 @@ class RealizarCheckoutServicioTests(TestCase):
     def test_sin_stock_suficiente_lanza_estado_invalido(self):
         with self.assertRaisesMessage(EstadoInvalido, "Stock insuficiente para Teclado"):
             servicios.realizar_checkout(
-                self.cliente.pk, [{"id_producto": self.teclado.pk, "cantidad": 3}]
+                self.cliente.pk, [{"id_producto": self.teclado.pk, "cantidad": 3}], fabricas.ENVIO
             )
 
     def test_cliente_inexistente_lanza_no_encontrado(self):
         with self.assertRaises(NoEncontrado):
-            servicios.realizar_checkout(9999, [{"id_producto": self.teclado.pk, "cantidad": 1}])
+            servicios.realizar_checkout(
+                9999, [{"id_producto": self.teclado.pk, "cantidad": 1}], fabricas.ENVIO
+            )

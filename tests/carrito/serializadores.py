@@ -13,6 +13,12 @@ def a_dict(pedido):
         "estado": pedido.estado,
         "fecha": pedido.creado_en.isoformat(),
         "total": str(pedido.total()),
+        "envio": {
+            "nombre": pedido.envio_nombre,
+            "direccion": pedido.envio_direccion,
+            "ciudad": pedido.envio_ciudad,
+            "telefono": pedido.envio_telefono,
+        },
         "items": [
             {
                 "id_producto": item.producto_id,
