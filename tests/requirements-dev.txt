@@ -1,0 +1,5 @@
+# Herramientas de calidad y seguridad del CI (no se instalan en producción).
+-r requirements.txt
+coverage>=7.4
+bandit>=1.7.8
+pip-audit>=2.7

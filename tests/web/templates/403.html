@@ -1,0 +1,5 @@
+{% extends "web/base.html" %}
+{% block titulo %}Sin permiso{% endblock %}
+{% block contenido %}
+<section class="tarjeta vacio"><h1>No tienes permiso para ver esta página</h1><p>Tu rol no incluye esta sección.</p><a class="boton boton--secundario" href="{% url 'web:inicio' %}">Ir al inicio</a></section>
+{% endblock %}

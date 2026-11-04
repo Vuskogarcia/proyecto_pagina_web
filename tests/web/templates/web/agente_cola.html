@@ -1,0 +1,23 @@
+{% extends "web/base.html" %}
+{% block titulo %}Cola de PQR{% endblock %}
+{% block contenido %}
+<div class="encabezado">
+  <div>
+    <h1>Cola de PQR sin asignar</h1>
+    <p class="ayuda">Toma una solicitud para atenderla. Si otro agente la toma primero, te avisaremos y quedará con él.</p>
+  </div>
+  <form class="fila-form" method="get">
+    <label for="orden">Ordenar</label>
+    <select id="orden" name="orden" class="campo">
+      <option value="antiguos" {% if orden == "antiguos" %}selected{% endif %}>Más antiguas primero</option>
+      <option value="recientes" {% if orden == "recientes" %}selected{% endif %}>Más recientes primero</option>
+    </select>
+    <button class="boton boton--secundario boton--chico" type="submit">Aplicar</button>
+  </form>
+</div>
+{% if tickets %}
+  {% include "web/_tabla_tickets.html" with titulo_tabla="PQR sin asignar" mostrar_cliente=True accion_tomar=True %}
+{% else %}
+  <div class="tarjeta vacio"><p>No hay PQR pendientes.</p></div>
+{% endif %}
+{% endblock %}

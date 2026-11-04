@@ -1,0 +1,26 @@
+{% extends "web/base.html" %}{% load formato %}
+{% block titulo %}Mis pedidos{% endblock %}
+{% block contenido %}
+<h1>Mis pedidos</h1>
+{% if pedidos %}
+<div class="tarjeta">
+  <table class="tabla">
+    <caption class="sr">Tus pedidos</caption>
+    <thead><tr><th scope="col">Pedido</th><th scope="col">Fecha</th><th scope="col">Estado</th><th scope="col">Total</th><th scope="col"><span class="sr">Acciones</span></th></tr></thead>
+    <tbody>
+    {% for p in pedidos %}
+      <tr>
+        <th scope="row"><a href="{% url 'web:pedido' p.pk %}">{{ p.codigo }}</a></th>
+        <td>{{ p.creado_en|date:"d/m/Y H:i" }}</td>
+        <td>{% include "web/_estado.html" with estado=p.estado %}</td>
+        <td>{{ p.total|pesos }}</td>
+        <td><a href="{% url 'web:pqr_nueva' %}?pedido={{ p.pk }}">Radicar PQR</a></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="tarjeta vacio"><p>Todavía no tienes pedidos.</p><a class="boton boton--secundario" href="{% url 'web:inicio' %}">Ver catálogo</a></div>
+{% endif %}
+{% endblock %}

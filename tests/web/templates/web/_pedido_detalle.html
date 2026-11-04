@@ -1,0 +1,11 @@
+{% load formato %}
+<table class="tabla">
+  <caption class="sr">Productos del pedido {{ pedido.codigo }}</caption>
+  <thead><tr><th scope="col">Producto</th><th scope="col">Precio pagado</th><th scope="col">Cantidad</th><th scope="col">Subtotal</th></tr></thead>
+  <tbody>
+  {% for i in pedido.items.all %}
+    <tr><th scope="row">{{ i.producto.nombre }}</th><td>{{ i.precio_pactado|pesos }}</td><td>{{ i.cantidad }}</td><td>{{ i.subtotal|pesos }}</td></tr>
+  {% endfor %}
+  </tbody>
+  <tfoot><tr><th scope="row" colspan="3">Total</th><td><strong>{{ pedido.total|pesos }}</strong></td></tr></tfoot>
+</table>

@@ -1,0 +1,41 @@
+{% extends "web/base.html" %}{% load formato %}
+{% block titulo %}Gestión de catálogo{% endblock %}
+{% block contenido %}
+<div class="encabezado">
+  <div>
+    <h1>Gestión de catálogo</h1>
+    <p class="ayuda">Crea productos, ajusta precio y stock, o retíralos del catálogo sin borrarlos.</p>
+  </div>
+  <a class="boton boton--accion" href="{% url 'web:gestion_producto_nuevo' %}">Nuevo producto</a>
+</div>
+{% if productos %}
+<div class="tarjeta">
+  <table class="tabla">
+    <caption class="sr">Todos los productos</caption>
+    <thead><tr><th scope="col">Producto</th><th scope="col">Precio</th><th scope="col">Stock</th><th scope="col">Estado</th><th scope="col"><span class="sr">Acciones</span></th></tr></thead>
+    <tbody>
+    {% for p in productos %}
+      <tr>
+        <th scope="row"><a href="{% url 'web:gestion_producto_editar' p.pk %}">{{ p.nombre }}</a></th>
+        <td>{{ p.precio|pesos }}</td>
+        <td>{{ p.stock }}{% if p.agotado %} <span class="etiqueta etiqueta--agotado">Agotado</span>{% endif %}</td>
+        <td>{% if p.activo %}<span class="estado estado--confirmado">Visible</span>{% else %}<span class="estado estado--cerrado">Retirado</span>{% endif %}</td>
+        <td>
+          <div class="acciones">
+          <a href="{% url 'web:gestion_producto_editar' p.pk %}">Editar<span class="sr"> {{ p.nombre }}</span></a>
+          <form method="post" action="{% url 'web:gestion_producto_activo' p.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="activo" value="{% if p.activo %}0{% else %}1{% endif %}">
+            <button class="boton-texto{% if p.activo %} boton-texto--peligro{% endif %}" type="submit">{% if p.activo %}Retirar{% else %}Volver a publicar{% endif %}<span class="sr"> {{ p.nombre }}</span></button>
+          </form>
+          </div>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="tarjeta vacio"><p>Aún no hay productos.</p></div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "web/base.html" %}
+{% block titulo %}Crear cuenta{% endblock %}
+{% block contenido %}
+<section class="tarjeta formulario-corto">
+  <h1>Crear cuenta</h1>
+  <p class="ayuda">Tu cuenta será de cliente. Los agentes de soporte los asigna un administrador.</p>
+  <form method="post">
+    {% csrf_token %}
+    {% include "web/_errores_form.html" %}
+    {% include "web/_campo.html" with campo=form.nombre %}
+    {% include "web/_campo.html" with campo=form.email %}
+    {% include "web/_campo.html" with campo=form.clave %}
+    {% include "web/_campo.html" with campo=form.clave2 %}
+    <button class="boton boton--accion boton--ancho" type="submit">Crear cuenta</button>
+  </form>
+  <p class="ayuda">¿Ya tienes cuenta? <a href="{% url 'web:entrar' %}">Entra</a></p>
+</section>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "web/base.html" %}{% load formato %}
+{% block titulo %}Datos de envío{% endblock %}
+{% block contenido %}
+<p class="migas"><a href="{% url 'web:carrito' %}">Carrito</a> / Datos de envío</p>
+<div class="carrito">
+  <section class="tarjeta">
+    <h1>¿A dónde enviamos tu pedido?</h1>
+    <form method="post">
+      {% csrf_token %}
+      {% include "web/_errores_form.html" %}
+      {% include "web/_campo.html" with campo=form.nombre %}
+      {% include "web/_campo.html" with campo=form.direccion %}
+      {% include "web/_campo.html" with campo=form.ciudad %}
+      {% include "web/_campo.html" with campo=form.telefono %}
+      <button class="boton boton--accion" type="submit">Pagar {{ total|pesos }}</button>
+    </form>
+  </section>
+  <aside class="tarjeta resumen" aria-label="Resumen de compra">
+    <h2>Resumen</h2>
+    <ul class="lista-resumen">
+      {% for l in lineas %}<li><span>{{ l.cantidad }} × {{ l.producto.nombre }}</span> <span>{{ l.subtotal|pesos }}</span></li>{% endfor %}
+    </ul>
+    <p class="resumen__total"><span>Total</span> <strong>{{ total|pesos }}</strong></p>
+    <a href="{% url 'web:carrito' %}">Volver al carrito</a>
+  </aside>
+</div>
+{% endblock %}

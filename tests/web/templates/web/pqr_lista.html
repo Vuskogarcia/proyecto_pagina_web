@@ -1,0 +1,16 @@
+{% extends "web/base.html" %}
+{% block titulo %}Mis PQR{% endblock %}
+{% block contenido %}
+<div class="encabezado">
+  <div>
+    <h1>Mis PQR</h1>
+    <p class="ayuda">Peticiones, quejas y reclamos que has radicado, con su estado actual.</p>
+  </div>
+  <a class="boton boton--accion" href="{% url 'web:pqr_nueva' %}">Radicar PQR</a>
+</div>
+{% if tickets %}
+  {% include "web/_tabla_tickets.html" with titulo_tabla="Tus PQR" %}
+{% else %}
+  <div class="tarjeta vacio"><p>No has radicado ninguna PQR.</p></div>
+{% endif %}
+{% endblock %}

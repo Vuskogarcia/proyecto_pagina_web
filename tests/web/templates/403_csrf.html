@@ -1,0 +1,5 @@
+{% extends "web/base.html" %}
+{% block titulo %}Formulario vencido{% endblock %}
+{% block contenido %}
+<section class="tarjeta vacio"><h1>El formulario expiró</h1><p>Por seguridad, recarga la página e inténtalo de nuevo.</p><a class="boton boton--secundario" href="{% url 'web:inicio' %}">Ir al inicio</a></section>
+{% endblock %}

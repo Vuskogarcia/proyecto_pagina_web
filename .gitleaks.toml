@@ -1,0 +1,23 @@
+# Configuración de gitleaks (búsqueda de secretos, CI semana 13 §7).
+title = "SHOP-HUB"
+
+[extend]
+useDefault = true
+
+# Las claves de Django no las detectan las reglas por defecto.
+[[rules]]
+id = "django-secret-key"
+description = "SECRET_KEY de Django escrita en el código"
+regex = '''django-insecure-[A-Za-z0-9!@#$%^&*()_+=\-]{30,}'''
+keywords = ["django-insecure"]
+
+# H12 / ADL-08 / DT-13: estas claves ya están en el historial. Se listan
+# aquí para que el CI no falle por ellas mientras el equipo decide si rota o
+# purga; cualquier clave NUEVA sí hace fallar el pipeline.
+[allowlist]
+description = "Claves históricas conocidas (pendiente de decisión del equipo, DT-13)"
+commits = [
+  "1a2b391a6cd53ce11891512c958884a3ee9c71bd",
+  "83705b39cb697223ded520726ba0d2e3dc5592d1",
+  "2c19dafa9af41a1a2bb211f3c82db5e3a16548b2",
+]

@@ -1,0 +1,53 @@
+{% extends "web/base.html" %}{% load formato %}
+{% block titulo %}Carrito{% endblock %}
+{% block contenido %}
+<h1>Tu carrito</h1>
+{% if lineas %}
+<div class="carrito">
+  <div class="tarjeta">
+    <table class="tabla">
+      <caption class="sr">Productos en el carrito</caption>
+      <thead><tr><th scope="col">Producto</th><th scope="col">Precio</th><th scope="col">Cantidad</th><th scope="col">Subtotal</th><th scope="col"><span class="sr">Acciones</span></th></tr></thead>
+      <tbody>
+      {% for l in lineas %}
+        <tr>
+          <th scope="row"><a href="{% url 'web:producto' l.producto.pk %}">{{ l.producto.nombre }}</a>
+            {% if l.sin_stock %}<br><span class="etiqueta etiqueta--alerta">Solo hay {{ l.producto.stock }}</span>{% endif %}</th>
+          <td>{{ l.producto.precio|pesos }}</td>
+          <td>
+            <form class="fila-form" method="post" action="{% url 'web:carrito_actualizar' %}">
+              {% csrf_token %}
+              <input type="hidden" name="id_producto" value="{{ l.producto.pk }}">
+              <label class="sr" for="cant-{{ l.producto.pk }}">Cantidad de {{ l.producto.nombre }}</label>
+              <input id="cant-{{ l.producto.pk }}" class="campo campo--corto" type="number" name="cantidad" value="{{ l.cantidad }}" min="1" max="1000" required>
+              <button class="boton boton--secundario boton--chico" type="submit">Actualizar</button>
+            </form>
+          </td>
+          <td>{{ l.subtotal|pesos }}</td>
+          <td>
+            <form method="post" action="{% url 'web:carrito_quitar' %}">
+              {% csrf_token %}
+              <input type="hidden" name="id_producto" value="{{ l.producto.pk }}">
+              <button class="boton-texto boton-texto--peligro" type="submit">Quitar<span class="sr"> {{ l.producto.nombre }}</span></button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <aside class="tarjeta resumen" aria-label="Resumen de compra">
+    <h2>Resumen</h2>
+    <p class="resumen__total"><span>Total</span> <strong>{{ total|pesos }}</strong></p>
+    <a class="boton boton--accion boton--ancho" href="{% url 'web:carrito_pagar' %}">Continuar al pago</a>
+    <p class="ayuda">En el siguiente paso ingresas los datos de envío. El precio y el stock se confirman al pagar.</p>
+    <a href="{% url 'web:inicio' %}">Seguir comprando</a>
+  </aside>
+</div>
+{% else %}
+<div class="tarjeta vacio">
+  <p>Tu carrito está vacío.</p>
+  <a class="boton boton--secundario" href="{% url 'web:inicio' %}">Ver catálogo</a>
+</div>
+{% endif %}
+{% endblock %}

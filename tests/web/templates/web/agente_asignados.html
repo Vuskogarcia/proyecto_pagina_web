@@ -1,0 +1,10 @@
+{% extends "web/base.html" %}
+{% block titulo %}Mis asignados{% endblock %}
+{% block contenido %}
+<h1>PQR asignadas a mí</h1>
+{% if tickets %}
+  {% include "web/_tabla_tickets.html" with titulo_tabla="PQR asignadas" mostrar_cliente=True %}
+{% else %}
+  <div class="tarjeta vacio"><p>No tienes PQR asignadas. <a href="{% url 'web:cola' %}">Ve a la cola</a>.</p></div>
+{% endif %}
+{% endblock %}

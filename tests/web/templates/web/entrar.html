@@ -1,0 +1,17 @@
+{% extends "web/base.html" %}
+{% block titulo %}Entrar{% endblock %}
+{% block contenido %}
+<section class="tarjeta formulario-corto">
+  <h1>Entrar</h1>
+  <p class="ayuda">Accede para comprar, ver tus pedidos y radicar PQR.</p>
+  <form method="post">
+    {% csrf_token %}
+    {% include "web/_errores_form.html" %}
+    {% include "web/_campo.html" with campo=form.usuario %}
+    {% include "web/_campo.html" with campo=form.clave %}
+    <input type="hidden" name="next" value="{{ next }}">
+    <button class="boton boton--accion boton--ancho" type="submit">Entrar</button>
+  </form>
+  <p class="ayuda">¿No tienes cuenta? <a href="{% url 'web:registro' %}">Regístrate</a></p>
+</section>
+{% endblock %}

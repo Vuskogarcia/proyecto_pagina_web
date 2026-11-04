@@ -1,0 +1,16 @@
+# Cobertura de pruebas (quality gate del CI, guía semana 13 §7).
+[run]
+source = .
+omit =
+    */migrations/*
+    */pruebas/*
+    venv/*
+    .venv/*
+    staticfiles/*
+    manage.py
+    config/asgi.py
+    config/wsgi.py
+
+[report]
+show_missing = True
+skip_covered = True

@@ -1,0 +1,24 @@
+{% extends "web/base.html" %}
+{% block titulo %}Radicar PQR{% endblock %}
+{% block contenido %}
+<p class="migas"><a href="{% url 'web:pqr_lista' %}">Mis PQR</a> / Radicar</p>
+<section class="tarjeta formulario-medio">
+  <h1>Radicar una PQR</h1>
+  <p class="ayuda">Cuéntanos qué pasó. Si se trata de una compra, elige el pedido: así el agente verá exactamente qué compraste.</p>
+  <form method="post">
+    {% csrf_token %}
+    {% include "web/_errores_form.html" %}
+    <fieldset class="grupo opciones{% if form.tipo.errors %} grupo--error{% endif %}">
+      <legend>{{ form.tipo.label }}</legend>
+      <div class="opciones__lista">
+      {% for opcion in form.tipo %}<label class="opcion">{{ opcion.tag }} <span>{{ opcion.choice_label }}</span></label>{% endfor %}
+      </div>
+      {% for e in form.tipo.errors %}<p class="error-campo">{{ e }}</p>{% endfor %}
+    </fieldset>
+    {% include "web/_campo.html" with campo=form.pedido %}
+    {% include "web/_campo.html" with campo=form.asunto %}
+    {% include "web/_campo.html" with campo=form.descripcion %}
+    <button class="boton boton--accion" type="submit">Enviar PQR</button>
+  </form>
+</section>
+{% endblock %}
