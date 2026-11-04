@@ -17,6 +17,8 @@ class HU07ColaSinAsignarTests(TestCase):
         self.segundo = fabricas.ticket(self.cliente, "Segundo")
         self.tomado = fabricas.ticket(self.cliente, "Ya tomado")
         servicios.tomar_ticket(self.tomado.pk, self.agente.pk)
+        # HU-01: la cola es solo para agentes (ADL-01).
+        self.client.force_login(self.agente)
 
     def test_criterio1y4_muestra_solo_los_tickets_sin_asignar(self):
         respuesta = self.client.get("/api/tickets/cola/")

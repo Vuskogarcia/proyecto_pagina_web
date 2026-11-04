@@ -12,12 +12,13 @@ class CheckoutCasosBordeTests(TestCase):
     def setUp(self):
         self.cliente = fabricas.cliente()
         self.teclado = fabricas.producto("Teclado", "100", stock=5)
+        self.client.force_login(self.cliente)
 
     def post(self, cuerpo):
         return self.client.post("/api/pedidos/", data=cuerpo, content_type="application/json")
 
     def checkout(self, items):
-        return self.post(json.dumps({"id_cliente": self.cliente.pk, "items": items}))
+        return self.post(json.dumps({"items": items}))
 
     def test_el_mismo_producto_repetido_se_agrupa_en_un_solo_item(self):
         respuesta = self.checkout(
@@ -69,4 +70,4 @@ class CheckoutCasosBordeTests(TestCase):
 
     def test_pedido_inexistente_responde_404_y_metodo_no_permitido_405(self):
         self.assertEqual(self.client.get("/api/pedidos/9999/").status_code, 404)
-        self.assertEqual(self.client.get("/api/pedidos/").status_code, 405)
+        self.assertEqual(self.client.put("/api/pedidos/").status_code, 405)

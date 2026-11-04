@@ -1,0 +1,39 @@
+{% extends "web/base.html" %}{% load formato %}
+{% block titulo %}Catálogo{% endblock %}
+{% block contenido %}
+<section class="portada">
+  <div>
+    <h1>Compra con confianza</h1>
+    <p>Tecnología para tu día a día. Y si algo sale mal, radicas tu PQR ligada al pedido y la seguimos hasta resolverla.</p>
+  </div>
+</section>
+
+<h2 class="titulo-seccion">Productos</h2>
+{% if productos %}
+<ul class="rejilla" role="list">
+  {% for p in productos %}
+  <li class="tarjeta producto">
+    <a class="producto__imagen" href="{% url 'web:producto' p.pk %}" aria-hidden="true" tabindex="-1">{{ p.nombre|inicial }}</a>
+    <div class="producto__cuerpo">
+      <h3><a href="{% url 'web:producto' p.pk %}">{{ p.nombre }}</a></h3>
+      <p class="producto__desc">{{ p.descripcion }}</p>
+      <p class="producto__precio">{{ p.precio|pesos }}</p>
+      {% if p.agotado %}
+        <p><span class="etiqueta etiqueta--agotado">Agotado</span></p>
+      {% else %}
+        <form method="post" action="{% url 'web:carrito_agregar' %}">
+          {% csrf_token %}
+          <input type="hidden" name="id_producto" value="{{ p.pk }}">
+          <input type="hidden" name="cantidad" value="1">
+          <input type="hidden" name="next" value="{% url 'web:inicio' %}">
+          <button class="boton boton--accion" type="submit">Añadir al carrito</button>
+        </form>
+      {% endif %}
+    </div>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="vacio">Aún no hay productos en el catálogo.</p>
+{% endif %}
+{% endblock %}

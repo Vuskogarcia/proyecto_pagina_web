@@ -17,9 +17,20 @@ class TicketSoporte(models.Model):
         (CERRADO, "Cerrado"),
     ]
 
+    # Tipo de PQR (petición, queja o reclamo), como se radica en la interfaz.
+    PETICION = "PETICION"
+    QUEJA = "QUEJA"
+    RECLAMO = "RECLAMO"
+    TIPOS = [
+        (PETICION, "Petición"),
+        (QUEJA, "Queja"),
+        (RECLAMO, "Reclamo"),
+    ]
+
     cliente = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="tickets"
     )
+    tipo = models.CharField(max_length=10, choices=TIPOS, default=PETICION)
     pedido = models.ForeignKey(
         "carrito.Pedido",
         on_delete=models.SET_NULL,

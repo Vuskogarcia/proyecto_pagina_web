@@ -1,0 +1,31 @@
+{% extends "web/base.html" %}
+{% block titulo %}{{ ticket.numero }}{% endblock %}
+{% block contenido %}
+<p class="migas">{% if es_agente %}<a href="{% url 'web:asignados' %}">Mis asignados</a>{% else %}<a href="{% url 'web:pqr_lista' %}">Mis PQR</a>{% endif %} / {{ ticket.numero }}</p>
+<div class="encabezado">
+  <div>
+    <h1>{{ ticket.numero }} · {{ ticket.get_tipo_display }}</h1>
+    <p class="ayuda">Radicada el {{ ticket.creado_en|date:"d/m/Y H:i" }} · {% include "web/_estado.html" with estado=ticket.estado %}</p>
+  </div>
+</div>
+<div class="dos-columnas">
+  <article class="tarjeta">
+    <h2>{{ ticket.asunto|default:"Sin asunto" }}</h2>
+    <p class="texto-largo">{{ ticket.descripcion|linebreaksbr }}</p>
+  </article>
+  <aside class="tarjeta">
+    <h2>Seguimiento</h2>
+    <dl class="datos">
+      <dt>Cliente</dt><dd>{{ ticket.cliente.get_full_name|default:ticket.cliente.username }}</dd>
+      <dt>Agente</dt><dd>{% if ticket.agente %}{{ ticket.agente.get_full_name|default:ticket.agente.username }}{% else %}Sin asignar todavía{% endif %}</dd>
+      <dt>Pedido</dt><dd>{% if ticket.pedido %}<a href="{% url 'web:pedido' ticket.pedido.pk %}">{{ ticket.pedido.codigo }}</a>{% else %}Consulta general{% endif %}</dd>
+    </dl>
+  </aside>
+</div>
+{% if es_agente and ticket.pedido %}
+<section class="seccion">
+  <h2>Pedido {{ ticket.pedido.codigo }} <span class="ayuda">({{ ticket.pedido.creado_en|date:"d/m/Y" }})</span></h2>
+  <div class="tarjeta">{% include "web/_pedido_detalle.html" with pedido=ticket.pedido %}</div>
+</section>
+{% endif %}
+{% endblock %}

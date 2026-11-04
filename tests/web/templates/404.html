@@ -1,0 +1,5 @@
+{% extends "web/base.html" %}
+{% block titulo %}No encontrado{% endblock %}
+{% block contenido %}
+<section class="tarjeta vacio"><h1>No encontramos lo que buscas</h1><p>La página no existe o no tienes acceso a ella.</p><a class="boton boton--secundario" href="{% url 'web:inicio' %}">Ir al inicio</a></section>
+{% endblock %}

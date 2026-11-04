@@ -24,11 +24,15 @@ class HU08TomarTicketTests(TestCase):
         self.ticket = fabricas.ticket(self.cliente)
 
     def tomar(self, agente, ticket_id=None):
-        return self.client.post(
-            f"/api/tickets/{ticket_id or self.ticket.pk}/tomar/",
-            data=json.dumps({"id_agente": agente.pk}),
-            content_type="application/json",
-        )
+        url = f"/api/tickets/{ticket_id or self.ticket.pk}/tomar/"
+        # HU-01: el agente es el usuario en sesión, no un campo del cuerpo.
+        self.client.force_login(agente)
+        respuesta = self.client.post(url, content_type="application/json")
+        # Muestra en consola el código HTTP de cada intento (200, 409, 404...).
+        datos = respuesta.json()
+        detalle = datos.get("error") or f"agente={datos['agente']}, estado={datos['estado']}"
+        print(f"\n    POST {url} ({agente.username}) -> {respuesta.status_code} {detalle}")
+        return respuesta
 
     def test_criterio1y4_el_ticket_queda_asignado_y_registrado(self):
         respuesta = self.tomar(self.agente1)
@@ -90,6 +94,11 @@ class HU08ConcurrenciaTests(TransactionTestCase):
             hilo.start()
         for hilo in hilos:
             hilo.join()
+
+        # Muestra en consola qué obtuvo cada agente (la API traduce rechazado -> 409).
+        codigos = {"exito": 200, "rechazado": 409}
+        for nombre, resultado in sorted(resultados.items()):
+            print(f"\n    {nombre} -> {codigos[resultado]} ({resultado})")
 
         # VERIFICAR: exactamente uno tuvo éxito y el otro fue rechazado,
         # nunca ambos con éxito (eso sería la condición de carrera).

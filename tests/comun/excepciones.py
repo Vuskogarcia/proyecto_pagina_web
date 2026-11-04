@@ -35,3 +35,15 @@ class SinPermiso(ErrorDeNegocio):
     intentando tomar un ticket, que es tarea de un agente)."""
 
     status = 403
+
+
+class NoAutenticado(ErrorDeNegocio):
+    """La operación requiere iniciar sesión (HU-01, ADL-01)."""
+
+    status = 401
+
+
+class DemasiadosIntentos(ErrorDeNegocio):
+    """Se superó el límite de intentos de inicio de sesión."""
+
+    status = 429

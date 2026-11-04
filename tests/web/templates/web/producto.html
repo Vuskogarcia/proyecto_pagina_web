@@ -1,0 +1,25 @@
+{% extends "web/base.html" %}{% load formato %}
+{% block titulo %}{{ producto.nombre }}{% endblock %}
+{% block contenido %}
+<p class="migas"><a href="{% url 'web:inicio' %}">Catálogo</a> / {{ producto.nombre }}</p>
+<article class="tarjeta detalle-producto">
+  <div class="producto__imagen producto__imagen--grande" aria-hidden="true">{{ producto.nombre|inicial }}</div>
+  <div>
+    <h1>{{ producto.nombre }}</h1>
+    <p class="producto__precio producto__precio--grande">{{ producto.precio|pesos }}</p>
+    <p>{{ producto.descripcion }}</p>
+    {% if producto.agotado %}
+      <p><span class="etiqueta etiqueta--agotado">Agotado</span></p>
+    {% else %}
+      <p class="ayuda">{{ producto.stock }} disponible{{ producto.stock|pluralize }}</p>
+      <form class="fila-form" method="post" action="{% url 'web:carrito_agregar' %}">
+        {% csrf_token %}
+        <input type="hidden" name="id_producto" value="{{ producto.pk }}">
+        <label for="cantidad">Cantidad</label>
+        <input id="cantidad" class="campo campo--corto" type="number" name="cantidad" value="1" min="1" max="{{ producto.stock }}" required>
+        <button class="boton boton--accion" type="submit">Añadir al carrito</button>
+      </form>
+    {% endif %}
+  </div>
+</article>
+{% endblock %}

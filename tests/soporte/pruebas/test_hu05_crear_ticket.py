@@ -17,9 +17,11 @@ class HU05CrearTicketTests(TestCase):
         teclado = fabricas.producto()
         self.pedido = fabricas.pedido(self.cliente, [(teclado, 1)])
         self.pedido_ajeno = fabricas.pedido(self.otro_cliente, [(teclado, 1)])
+        # HU-01: el ticket queda a nombre del usuario en sesión (ADL-01).
+        self.client.force_login(self.cliente)
 
     def crear(self, **datos):
-        cuerpo = {"id_cliente": self.cliente.pk, "descripcion": "No llegó el paquete"}
+        cuerpo = {"descripcion": "No llegó el paquete"}
         cuerpo.update(datos)
         return self.client.post(
             "/api/tickets/", data=json.dumps(cuerpo), content_type="application/json"
@@ -52,10 +54,12 @@ class HU05CrearTicketTests(TestCase):
         self.assertNotEqual(primero["numero"], segundo["numero"])
 
     def test_datos_invalidos_o_pedido_ajeno_no_crean_el_ticket(self):
-        # Un cliente no puede asociar el pedido de otro cliente.
-        self.assertEqual(self.crear(id_pedido=self.pedido_ajeno.pk).status_code, 400)
-        self.assertEqual(self.crear(descripcion="   ").status_code, 400)
-        self.assertEqual(self.crear(id_cliente=9999).status_code, 404)
+        # Un cliente no puede asociar el pedido de otro cliente: responde igual
+        # que un pedido inexistente (404, ADL-03) para no revelar que existe.
+        self.assertEqual(self.crear(id_pedido=self.pedido_ajeno.pk).status_code, 404)
         self.assertEqual(self.crear(id_pedido=9999).status_code, 404)
+        self.assertEqual(self.crear(descripcion="   ").status_code, 400)
+        # Ya no se acepta elegir el cliente por el cuerpo (ADL-01).
+        self.assertEqual(self.crear(id_cliente=self.otro_cliente.pk).status_code, 400)
 
         self.assertEqual(TicketSoporte.objects.count(), 0)

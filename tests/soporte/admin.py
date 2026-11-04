@@ -5,8 +5,8 @@ from .models import RegistroAsignacion, TicketSoporte
 
 @admin.register(TicketSoporte)
 class TicketSoporteAdmin(admin.ModelAdmin):
-    list_display = ("numero", "cliente", "pedido", "estado", "agente", "creado_en")
-    list_filter = ("estado",)
+    list_display = ("numero", "tipo", "cliente", "pedido", "estado", "agente", "creado_en")
+    list_filter = ("estado", "tipo")
 
 
 @admin.register(RegistroAsignacion)

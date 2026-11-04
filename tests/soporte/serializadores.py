@@ -13,6 +13,7 @@ def a_dict(ticket):
         "cliente": ticket.cliente.username,
         "id_pedido": ticket.pedido_id,
         "pedido": ticket.pedido.codigo if ticket.pedido else None,
+        "tipo": ticket.tipo,
         "asunto": ticket.asunto,
         "descripcion": ticket.descripcion,
         "estado": ticket.estado,

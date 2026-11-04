@@ -15,11 +15,13 @@ class HU04CheckoutTests(TestCase):
         self.cliente = fabricas.cliente()
         self.teclado = fabricas.producto("Teclado mecánico", "150000", stock=5)
         self.mouse = fabricas.producto("Mouse inalámbrico", "60000", stock=3)
+        # HU-01: el pedido queda a nombre del usuario en sesión (ADL-01).
+        self.client.force_login(self.cliente)
 
-    def checkout(self, items, id_cliente=None):
-        return self.client.post(
+    def checkout(self, items, cliente_http=None):
+        return (cliente_http or self.client).post(
             "/api/pedidos/",
-            data=json.dumps({"id_cliente": id_cliente or self.cliente.pk, "items": items}),
+            data=json.dumps({"items": items}),
             content_type="application/json",
         )
 
@@ -58,11 +60,13 @@ class HU04CheckoutTests(TestCase):
         self.assertEqual(
             self.checkout([{"id_producto": "abc", "cantidad": 1}]).status_code, 400
         )
-        # Producto o cliente inexistente: 404.
+        # Producto inexistente: 404. Sin sesión iniciada: 401.
         self.assertEqual(self.checkout([{"id_producto": 9999, "cantidad": 1}]).status_code, 404)
         self.assertEqual(
-            self.checkout([{"id_producto": self.teclado.pk, "cantidad": 1}], id_cliente=9999).status_code,
-            404,
+            self.checkout(
+                [{"id_producto": self.teclado.pk, "cantidad": 1}], cliente_http=self.client_class()
+            ).status_code,
+            401,
         )
         # El teclado sí alcanza, el mouse no: la operación es todo o nada (409).
         respuesta = self.checkout(

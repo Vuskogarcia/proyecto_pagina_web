@@ -1,0 +1,5 @@
+{% extends "web/base.html" %}
+{% block titulo %}Demasiadas peticiones{% endblock %}
+{% block contenido %}
+<section class="tarjeta vacio"><h1>Vas muy rápido</h1><p>{{ mensaje|default:"Demasiadas peticiones. Espera un momento e inténtalo de nuevo." }}</p><a class="boton boton--secundario" href="{% url 'web:inicio' %}">Ir al inicio</a></section>
+{% endblock %}

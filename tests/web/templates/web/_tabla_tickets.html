@@ -1,0 +1,27 @@
+<div class="tarjeta">
+  <table class="tabla">
+    <caption class="sr">{{ titulo_tabla }}</caption>
+    <thead><tr><th scope="col">Número</th><th scope="col">Tipo</th><th scope="col">Asunto</th>{% if mostrar_cliente %}<th scope="col">Cliente</th>{% endif %}<th scope="col">Pedido</th><th scope="col">Fecha</th><th scope="col">Estado</th>{% if accion_tomar %}<th scope="col"><span class="sr">Acciones</span></th>{% endif %}</tr></thead>
+    <tbody>
+    {% for t in tickets %}
+      <tr>
+        <th scope="row">{% if accion_tomar %}{{ t.numero }}{% else %}<a href="{% url 'web:pqr' t.pk %}">{{ t.numero }}</a>{% endif %}</th>
+        <td>{{ t.get_tipo_display }}</td>
+        <td>{{ t.asunto|default:t.descripcion|truncatechars:60 }}</td>
+        {% if mostrar_cliente %}<td>{{ t.cliente.get_full_name|default:t.cliente.username }}</td>{% endif %}
+        <td>{{ t.pedido.codigo|default:"—" }}</td>
+        <td>{{ t.creado_en|date:"d/m/Y H:i" }}</td>
+        <td>{% include "web/_estado.html" with estado=t.estado %}</td>
+        {% if accion_tomar %}
+        <td>
+          <form method="post" action="{% url 'web:tomar' t.pk %}">
+            {% csrf_token %}
+            <button class="boton boton--accion boton--chico" type="submit">Tomar<span class="sr"> {{ t.numero }}</span></button>
+          </form>
+        </td>
+        {% endif %}
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>

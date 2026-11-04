@@ -1,0 +1,13 @@
+{% extends "web/base.html" %}
+{% block titulo %}Pedido {{ pedido.codigo }}{% endblock %}
+{% block contenido %}
+{% if not es_agente %}<p class="migas"><a href="{% url 'web:pedidos' %}">Mis pedidos</a> / {{ pedido.codigo }}</p>{% endif %}
+<div class="encabezado">
+  <div>
+    <h1>Pedido {{ pedido.codigo }}</h1>
+    <p class="ayuda">{{ pedido.creado_en|date:"d/m/Y H:i" }} · {% include "web/_estado.html" with estado=pedido.estado %}</p>
+  </div>
+  {% if pedido.cliente_id == user.pk %}<a class="boton boton--secundario" href="{% url 'web:pqr_nueva' %}?pedido={{ pedido.pk }}">¿Problemas? Radica una PQR</a>{% endif %}
+</div>
+<div class="tarjeta">{% include "web/_pedido_detalle.html" %}</div>
+{% endblock %}

@@ -18,6 +18,7 @@ Documento vivo — registrar cada uso significativo de IA en el proyecto a medid
 Cada integrante agrega una fila cuando use IA de forma significativa (más allá de autocompletado simple).
 
 Fecha	Integrante	Herramienta	Para qué se usó	Qué se revisó/ajustó manualmente
+2026-11-02	Kevin García	Claude (Cowork)	Implementación de las recomendaciones de la auditoría de seguridad (ADL-01 a ADL-07, H13, H14), HU-01 (sesión y roles), carrito editable, tipo de PQR e interfaz web con plantillas Django; pruebas de seguridad escritas primero (en rojo) y verificadas en PostgreSQL. Ver docs/seguridad/ (semana-13.md y ai-decision-log-seguridad.md §5).	[PENDIENTE] Revisión línea por línea del equipo antes del commit; llenar «Decisión humana» en el AI Decision Log.
 				
 3. Buenas prácticas acordadas
 

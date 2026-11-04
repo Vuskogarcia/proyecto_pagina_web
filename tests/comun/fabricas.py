@@ -14,9 +14,14 @@ def cliente(username="cliente1"):
 
 
 def agente(username="agente1"):
-    return get_user_model().objects.create_user(
-        username=username, password="clave123", is_staff=True
-    )
+    """Agente de soporte: miembro del grupo "agentes" (no es is_staff, H14)."""
+    from django.contrib.auth.models import Group
+
+    from comun.roles import GRUPO_AGENTES
+
+    usuario = get_user_model().objects.create_user(username=username, password="clave123")
+    usuario.groups.add(Group.objects.get_or_create(name=GRUPO_AGENTES)[0])
+    return usuario
 
 
 def producto(nombre="Teclado mecánico", precio="150000", stock=10, activo=True):

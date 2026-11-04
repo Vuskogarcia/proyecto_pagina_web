@@ -12,6 +12,7 @@ Uso (desde la carpeta tests/):
 from decimal import Decimal
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
 from django.db import transaction
 
@@ -19,8 +20,11 @@ from carrito import servicios as pedidos
 from carrito.models import Pedido
 from catalogo.models import Producto
 from soporte import servicios as soporte
+from comun.roles import GRUPO_AGENTES
 from soporte.models import TicketSoporte
 
+# Clave SOLO para la demo local: estos usuarios no deben existir en un
+# despliegue real (la validación de contraseñas no se aplica aquí).
 CLAVE_DEMO = "demo12345"
 
 CLIENTES = [
@@ -72,17 +76,22 @@ class Command(BaseCommand):
             )
             return
 
-        # Usuarios: clientes normales y agentes (is_staff = pueden entrar a /admin/).
+        # Usuarios: clientes normales y agentes. El rol de agente es el grupo
+        # "agentes" (HU-01); no da acceso a /admin/ (H14).
+        grupo_agentes = Group.objects.get_or_create(name=GRUPO_AGENTES)[0]
+
         def crear_usuario(datos, es_agente):
             username, nombre, apellido, correo = datos
-            return Usuario.objects.create_user(
+            usuario = Usuario.objects.create_user(
                 username=username,
                 password=CLAVE_DEMO,
                 first_name=nombre,
                 last_name=apellido,
                 email=correo,
-                is_staff=es_agente,
             )
+            if es_agente:
+                usuario.groups.add(grupo_agentes)
+            return usuario
 
         ana, luis, maria = (crear_usuario(c, False) for c in CLIENTES)
         carlos, diana = (crear_usuario(a, True) for a in AGENTES)
