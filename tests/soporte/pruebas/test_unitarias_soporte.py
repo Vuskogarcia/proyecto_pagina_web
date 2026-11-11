@@ -29,8 +29,11 @@ class CrearTicketServicioTests(TestCase):
                 with self.assertRaises(DatosInvalidos):
                     servicios.crear_ticket(self.cliente.pk, descripcion)
 
-    def test_asunto_se_recorta_a_200_caracteres(self):
-        ticket = servicios.crear_ticket(self.cliente.pk, "desc", asunto="x" * 250)
+    def test_asunto_de_mas_de_200_caracteres_se_rechaza(self):
+        # Antes se recortaba a 200; desde la Historia 03 (Módulo 7) es un 400.
+        with self.assertRaises(DatosInvalidos):
+            servicios.crear_ticket(self.cliente.pk, "desc", asunto="x" * 201)
+        ticket = servicios.crear_ticket(self.cliente.pk, "desc", asunto="x" * 200)
         self.assertEqual(len(ticket.asunto), 200)
 
 

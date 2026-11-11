@@ -6,7 +6,7 @@ from django.db import transaction
 from carrito.models import Pedido
 from comun.excepciones import DatosInvalidos, EstadoInvalido, NoEncontrado, SinPermiso
 from comun.roles import es_agente
-from comun.validaciones import entero, texto, texto_seguro
+from comun.validaciones import entero, texto
 from cuentas import auditoria
 from cuentas.models import EventoAuditoria
 
@@ -34,9 +34,10 @@ def crear_ticket(cliente_id, descripcion, pedido_id=None, asunto="", tipo=None):
         raise DatosInvalidos(f"El tipo debe ser uno de: {', '.join(sorted(tipos_validos))}")
     pedido_id = entero(pedido_id, "id_pedido", obligatorio=False)
     descripcion = texto(descripcion, "descripcion", maximo=MAX_DESCRIPCION)
-    # El asunto es opcional y se recorta a 200 caracteres (comportamiento ya
-    # acordado), pero igual se valida contra NUL y surrogates (ADL-05).
-    asunto = texto_seguro(asunto.strip(), "asunto")[:MAX_ASUNTO] if isinstance(asunto, str) else ""
+    # El asunto es opcional. Antes se recortaba a 200 caracteres; desde la
+    # Historia 03 (Módulo 7) un asunto más largo es un 400, igual que la
+    # descripción: un texto de 50 000 caracteres no se acepta a medias.
+    asunto = texto(asunto, "asunto", obligatorio=False, maximo=MAX_ASUNTO) if asunto is not None else ""
 
     cliente = _usuario(cliente_id, "cliente")
     pedido = None
@@ -63,11 +64,15 @@ def cola_sin_asignar(orden="antiguos"):
     """HU-07: tickets abiertos que ningún agente ha tomado.
 
     Por defecto del más antiguo al más nuevo; `orden="recientes"` invierte.
+    Un orden fuera de la lista de permitidos es un 400 (ADL-04, Historia 03
+    del Módulo 7); antes se ignoraba en silencio.
     """
+    if orden not in ORDENES_COLA:
+        raise DatosInvalidos(f"El orden debe ser uno de: {', '.join(sorted(ORDENES_COLA))}")
     return (
         TicketSoporte.objects.filter(estado=TicketSoporte.ABIERTO, agente__isnull=True)
         .select_related("cliente", "pedido")
-        .order_by(*ORDENES_COLA.get(orden, ORDENES_COLA["antiguos"]))
+        .order_by(*ORDENES_COLA[orden])
     )
 
 

@@ -68,8 +68,9 @@ class InyeccionSqlTests(TestCase):
         fabricas.ticket(self.cliente)
 
         cola = self.client.get("/api/tickets/cola/", {"orden": f"creado_en{SQLI}"})
-        self.assertEqual(cola.status_code, 200)  # orden desconocido = orden por defecto
-        self.assertEqual(len(cola.json()["tickets"]), 1)
+        # Orden fuera de la lista de permitidos: 400 (antes se ignoraba y daba 200).
+        self.assertEqual(cola.status_code, 400)
+        self.assertEqual(len(self.client.get("/api/tickets/cola/").json()["tickets"]), 1)
         self.assertEqual(self.client.get(f"/api/productos/1{SQLI}/").status_code, 404)
         self.assertEqual(Producto.objects.count(), 1)
 
