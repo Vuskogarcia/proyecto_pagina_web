@@ -8,6 +8,7 @@ Seguro por defecto (ADL-07): DEBUG está apagado salvo que el .env lo
 encienda, y no existe SECRET_KEY de respaldo en el código.
 """
 
+import hashlib
 import os
 import sys
 import warnings
@@ -36,6 +37,20 @@ if not SECRET_KEY:
         "python -c \"from django.core.management.utils import get_random_secret_key as g; print(g())\""
     )
 _CLAVES_DE_EJEMPLO = ("django-insecure", "cambia-esto")
+# DT-13 / H12 (Módulo 7, Historia 05): claves que estuvieron en el historial
+# de Git. Se consideran comprometidas y quedan revocadas para siempre, con
+# o sin DEBUG. Se guarda la huella SHA-256, no la clave, para no volver a
+# escribirla en el repositorio. Procedimiento: docs/seguridad/rotacion-secret-key.md
+_CLAVES_REVOCADAS_SHA256 = {
+    "afed7fff6c98ef00c738422d3ec335a248cbc559be02584d63aaac731e98d5b1",  # commit 1a2b391
+    "07537ba1ab9d584aa9d186aaea1259d6e5584c56da2f68814cd2e183bc9fcec2",  # commit 2c19daf
+    "096833cf7a974b26f7b5d0e2a3922bb4845e4f8ab236612eddc6dfa3fdacb1a3",  # commit 83705b3
+}
+if hashlib.sha256(SECRET_KEY.encode("utf-8")).hexdigest() in _CLAVES_REVOCADAS_SHA256:
+    raise ImproperlyConfigured(
+        "SECRET_KEY revocada: estuvo publicada en el historial de Git (DT-13). "
+        "Genera una nueva (ver docs/seguridad/rotacion-secret-key.md)."
+    )
 if not DEBUG and (len(SECRET_KEY) < 50 or SECRET_KEY.startswith(_CLAVES_DE_EJEMPLO)):
     raise ImproperlyConfigured(
         "SECRET_KEY es de ejemplo o muy corta (mínimo 50 caracteres) y DEBUG está apagado."

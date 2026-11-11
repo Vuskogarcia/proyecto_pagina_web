@@ -11,11 +11,12 @@ description = "SECRET_KEY de Django escrita en el código"
 regex = '''django-insecure-[A-Za-z0-9!@#$%^&*()_+=\-]{30,}'''
 keywords = ["django-insecure"]
 
-# H12 / ADL-08 / DT-13: estas claves ya están en el historial. Se listan
-# aquí para que el CI no falle por ellas mientras el equipo decide si rota o
-# purga; cualquier clave NUEVA sí hace fallar el pipeline.
+# H12 / ADL-08 / DT-13: estas claves ya están en el historial. DT-13 se cerró
+# revocándolas (settings.py no arranca con ninguna; ver
+# docs/seguridad/rotacion-secret-key.md), sin purgar el historial. Se listan
+# aquí por commit; cualquier clave NUEVA sí hace fallar el pipeline.
 [allowlist]
-description = "Claves históricas conocidas (pendiente de decisión del equipo, DT-13)"
+description = "Claves históricas revocadas (DT-13 cerrada, Historia 05 del Módulo 7)"
 commits = [
   "1a2b391a6cd53ce11891512c958884a3ee9c71bd",
   "83705b39cb697223ded520726ba0d2e3dc5592d1",
