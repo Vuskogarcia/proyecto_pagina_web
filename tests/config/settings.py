@@ -145,11 +145,12 @@ PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.PBKDF2PasswordHasher",
     "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
 ]
-# Parámetros de Argon2id. La elección y su medición están en
-# docs/rendimiento/argon2.md (Historia 10). memory_cost va en KiB.
-ARGON2_TIME_COST = int(os.getenv("ARGON2_TIME_COST", "2"))
-ARGON2_MEMORY_COST = int(os.getenv("ARGON2_MEMORY_COST", "102400"))
-ARGON2_PARALLELISM = int(os.getenv("ARGON2_PARALLELISM", "8"))
+# Parámetros de Argon2id: segunda configuración recomendada por el RFC 9106
+# (t=3, m=64 MiB, p=4). Elegida midiendo tres configuraciones en esta
+# aplicación: docs/rendimiento/argon2.md (Historia 10). memory_cost va en KiB.
+ARGON2_TIME_COST = int(os.getenv("ARGON2_TIME_COST", "3"))
+ARGON2_MEMORY_COST = int(os.getenv("ARGON2_MEMORY_COST", "65536"))
+ARGON2_PARALLELISM = int(os.getenv("ARGON2_PARALLELISM", "4"))
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},

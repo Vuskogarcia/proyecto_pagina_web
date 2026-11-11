@@ -128,9 +128,10 @@ class ParametrosDeProduccionTests(TestCase):
         self.assertEqual(datos["hashers"][0], "comun.hashers.Argon2idPasswordHasher")
         self.assertIn("django.contrib.auth.hashers.PBKDF2PasswordHasher", datos["hashers"][1:])
         self.assertEqual(datos["algoritmo"], "argon2")
-        # Valores elegidos en docs/rendimiento/argon2.md (Historia 10).
-        self.assertEqual((datos["t"], datos["m"], datos["p"]), (2, 102400, 8))
-        self.assertTrue(datos["hash"].startswith("argon2$argon2id$v=19$m=102400,t=2,p=8$"))
+        # Valores elegidos en docs/rendimiento/argon2.md (Historia 10):
+        # RFC 9106, segunda configuración recomendada.
+        self.assertEqual((datos["t"], datos["m"], datos["p"]), (3, 65536, 4))
+        self.assertTrue(datos["hash"].startswith("argon2$argon2id$v=19$m=65536,t=3,p=4$"))
 
     def test_los_parametros_se_pueden_ajustar_por_entorno(self):
         datos = self.cargar(ARGON2_TIME_COST="3", ARGON2_MEMORY_COST="19456", ARGON2_PARALLELISM="1")
