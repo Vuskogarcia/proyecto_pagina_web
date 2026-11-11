@@ -12,7 +12,7 @@ El docente **aceptó que el proyecto se desarrolle en Python**, aunque su agente
 | --- | --- |
 | Quién aceptó | Docente del curso |
 | Medio | Verbal, en clase |
-| Fecha | _(completar: AAAA-MM-DD)_ |
+| Fecha | _(en la primera semana del semestre)_ |
 | Lenguaje aceptado | Python 3.11+ con Django |
 | Lenguaje configurado en el agente del docente | Java |
 | Integrantes del equipo | Kevin Vuskovit Garcia Gonzalez, Esteban Pinilla Vela |
