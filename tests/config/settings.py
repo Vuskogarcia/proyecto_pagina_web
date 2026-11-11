@@ -122,6 +122,20 @@ else:
     }
 
 
+# Hash de contraseñas (Módulo 7, Historia 04): Argon2id primero. PBKDF2 se
+# conserva después para verificar los hashes que ya existen; Django los
+# reemplaza por Argon2id cuando el usuario vuelve a iniciar sesión.
+PASSWORD_HASHERS = [
+    "comun.hashers.Argon2idPasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+]
+# Parámetros de Argon2id. La elección y su medición están en
+# docs/rendimiento/argon2.md (Historia 10). memory_cost va en KiB.
+ARGON2_TIME_COST = int(os.getenv("ARGON2_TIME_COST", "2"))
+ARGON2_MEMORY_COST = int(os.getenv("ARGON2_MEMORY_COST", "102400"))
+ARGON2_PARALLELISM = int(os.getenv("ARGON2_PARALLELISM", "8"))
+
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
@@ -192,6 +206,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # al cliente solo le llega un mensaje genérico. Durante `manage.py test` la
 # consola se silencia (las pruebas que revisan el log usan assertLogs).
 _EN_PRUEBAS = len(sys.argv) > 1 and sys.argv[1] == "test"
+
+# Solo durante `manage.py test`: Argon2id con costo mínimo para que la suite
+# (cientos de usuarios creados) no se vuelva lenta. Sigue siendo Argon2id;
+# los parámetros reales se verifican aparte en
+# cuentas/pruebas/test_m7_h04_argon2.py (cargando settings fuera de las pruebas).
+if _EN_PRUEBAS:
+    ARGON2_TIME_COST, ARGON2_MEMORY_COST, ARGON2_PARALLELISM = 1, 1024, 1
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
