@@ -17,6 +17,7 @@ docs/seguridad/semana-13.md para la evidencia ejecutada.
 import json
 import os
 import re
+import uuid
 from pathlib import Path
 from unittest import mock
 
@@ -161,7 +162,12 @@ class DivulgacionDeInformacionTests(TestCase):
                 self.assertLogs("shophub", level="ERROR"):
             respuesta = self.client.get("/api/productos/?debug=true")
         self.assertEqual(respuesta.status_code, 500)
-        self.assertEqual(respuesta.json(), {"error": "Error interno del servidor"})
+        # Solo el mensaje genérico y el id de seguimiento (Historia 06), nada más.
+        cuerpo = respuesta.json()
+        self.assertEqual(set(cuerpo), {"error", "id_error"})
+        self.assertEqual(cuerpo["error"], "Error interno del servidor")
+        self.assertEqual(str(uuid.UUID(cuerpo["id_error"])), cuerpo["id_error"])
+        self.assertNotRegex(respuesta.content.decode(), self.SENSIBLE)
 
     def test_el_login_no_revela_si_el_usuario_existe(self):
         cache.clear()

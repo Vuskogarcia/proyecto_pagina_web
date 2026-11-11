@@ -20,3 +20,6 @@ urlpatterns = [
     path("api/", include("soporte.urls")),
     path("", include("web.urls")),
 ]
+
+# Historia 06 (Módulo 7): todo 500 lleva un identificador de seguimiento.
+handler500 = "comun.http.error_500"

@@ -1,3 +1,3 @@
 {% load static %}<!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=1200"><title>Error · SHOP-HUB</title><link rel="stylesheet" href="{% static 'web/estilos.css' %}"></head>
-<body><main class="contenido"><section class="tarjeta vacio"><h1>Algo salió mal</h1><p>Ya quedó registrado y lo revisaremos. Intenta de nuevo en unos minutos.</p><a class="boton boton--secundario" href="/">Ir al inicio</a></section></main></body></html>
+<body><main class="contenido"><section class="tarjeta vacio"><h1>Algo salió mal</h1><p>Ya quedó registrado y lo revisaremos. Intenta de nuevo en unos minutos.</p>{% if id_error %}<p>Si escribes a soporte, menciona este código de seguimiento: <code class="id-error">{{ id_error }}</code></p>{% endif %}<a class="boton boton--secundario" href="/">Ir al inicio</a></section></main></body></html>

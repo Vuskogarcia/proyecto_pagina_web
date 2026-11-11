@@ -2,10 +2,12 @@
 
 import json
 import logging
+import sys
+import uuid
 from functools import wraps
 
 from django.core.exceptions import RequestDataTooBig
-from django.http import JsonResponse
+from django.http import HttpResponseServerError, JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_http_methods
 
@@ -65,15 +67,52 @@ def api(*metodos, acceso=AUTENTICADO):
             except RequestDataTooBig:
                 return JsonResponse({"error": "La petición es demasiado grande"}, status=413)
             except Exception:
-                logger.exception(
-                    "Error inesperado en %s %s usuario=%s", request.method, request.path, _quien(request)
-                )
-                _auditar("ERROR_INTERNO", request, f"{request.method} (detalle en el log)")
-                return JsonResponse({"error": "Error interno del servidor"}, status=500)
+                return _respuesta_500(request, sys.exc_info())
 
         return envoltura
 
     return decorador
+
+
+MENSAJE_500 = "Error interno del servidor"
+
+
+def _respuesta_500(request, exc_info):
+    """Historia 06 (Módulo 7): todo 500 lleva un identificador de seguimiento.
+
+    El mismo UUID va en la respuesta (campo `id_error` y cabecera
+    `X-Error-Id`), en el log `shophub` junto al traceback y en la auditoría.
+    Así soporte puede encontrar el error exacto con lo que ve el usuario,
+    sin que la respuesta revele nada interno.
+    """
+    id_error = str(uuid.uuid4())
+    logger.error(
+        "Error inesperado id_error=%s en %s %s usuario=%s",
+        id_error, request.method, request.path, _quien(request), exc_info=exc_info,
+    )
+    _auditar("ERROR_INTERNO", request, f"{request.method} id_error={id_error} (detalle en el log)")
+    if request.path.startswith("/api/"):
+        respuesta = JsonResponse({"error": MENSAJE_500, "id_error": id_error}, status=500)
+    else:
+        try:
+            respuesta = render(request, "500.html", {"id_error": id_error}, status=500)
+        except Exception:  # si la plantilla también falla, una respuesta mínima
+            logger.exception("No se pudo mostrar 500.html id_error=%s", id_error)
+            respuesta = HttpResponseServerError(
+                f"Error interno del servidor. Código de seguimiento: {id_error}",
+                content_type="text/plain; charset=utf-8",
+            )
+    respuesta["X-Error-Id"] = id_error
+    return respuesta
+
+
+def error_500(request):
+    """handler500 de Django (config/urls.py) para todo lo que no pasa por `@api`.
+
+    Django lo llama dentro del `except` que atrapó la excepción, así que
+    `sys.exc_info()` todavía tiene el traceback original.
+    """
+    return _respuesta_500(request, sys.exc_info())
 
 
 def _auditar(tipo, request, detalle=""):
