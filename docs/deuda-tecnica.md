@@ -14,7 +14,7 @@ Cada deuda tiene un origen, un impacto, un esfuerzo estimado y una prioridad.
 | DT-04 | El proyecto Django vive en `tests/`; renombrar a `app/` o `backend/` | RC-09 | Medio | S | P2 | Abierta |
 | DT-05 | HU-07 criterio 3: la cola solo se ordena por fecha, no por estado | DoD D1 | Medio | S | P2 | Parcial: fecha en ambos sentidos (`?orden=`); por estado no aplica mientras la cola solo tenga abiertos |
 | DT-06 | Las excepciones del dominio conocen el código HTTP; mover el mapeo excepción → status al decorador `@api` | RC-05 | Medio | S | P2 | Abierta |
-| DT-07 | N+1 consultas en `Pedido.total()` / serializador si no hay `prefetch_related` | RC-07 | Medio | S | P2 | Abierta |
+| DT-07 | N+1 consultas en `Pedido.total()` / serializador si no hay `prefetch_related` | RC-07 | Medio | S | P2 | Abierta: diferida en el RC; medida bajo carga sin pasar el umbral ([triage](triage-rc.md)) |
 | DT-08 | Pruebas que verifican varios escenarios en un solo método (HU-04 criterio 3, HU-05 reglas) | RC-08 | Bajo | S | P3 | Abierta |
 | DT-09 | SECRET_KEY y contraseña de BD por defecto en `settings.py` | RC-10 | Medio | S | P2 | ✅ Pagada (ADL-07) |
 | DT-10 | `Decisiones-tecnicas.md` desactualizado (todo en "Pendiente") | RC-11 | Bajo | S | P3 | Abierta |
@@ -37,3 +37,5 @@ Cada deuda tiene un origen, un impacto, un esfuerzo estimado y una prioridad.
 3. **P3** son de claridad y se pagan "de paso" cuando se toque ese archivo.
 
 Cuando una deuda se paga se marca ✅ y se enlaza el PR que la cerró.
+
+La decisión de qué deuda entra en el *release candidate* `v1.0.0-rc1` y cuál se difiere está en [`triage-rc.md`](triage-rc.md).
