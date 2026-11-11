@@ -47,7 +47,7 @@ pip-audit -r tests/requirements.txt
 | `check --deploy` | solo W021 (HSTS preload, decisión consciente) |
 | bandit (media o alta) | 0 hallazgos |
 | pip-audit | sin vulnerabilidades conocidas |
-| gitleaks | **No se ejecutó localmente** en esta sesión. Lo corre el job `seguridad` del CI en el PR |
+| gitleaks | No se ejecutó localmente en esta sesión. En el CI del PR #16 (run `42969051443`): **no leaks found**. En ese mismo run: 205 pruebas OK, cobertura 93 % y `test_m7_h05_claves_revocadas` ejecutada, no saltada |
 
 Salida completa: [`seguridad/evidencia/modulo7-ejecucion-postgresql.txt`](seguridad/evidencia/modulo7-ejecucion-postgresql.txt).
 
@@ -169,7 +169,7 @@ Detalle y decisión en [`triage-rc.md`](triage-rc.md) §2.2:
 - No prueban ataques que no se escribieron: una prueba verde solo cubre su escenario.
 - Las cotas de tiempo (1 s en ReDoS) y los umbrales de carga son de esta máquina y de este momento. Otra máquina da otros números.
 - La carga se generó desde la misma máquina que el servidor, con un solo proceso y durante 60 s.
-- gitleaks no se ejecutó localmente en esta sesión: su resultado es el del CI.
+- gitleaks no se ejecutó localmente en esta sesión: su resultado (sin secretos) es el del CI del PR #16.
 - Las decisiones de diseño marcadas como del equipo (AI Decision Log §2, `uso-ia.md`) siguen pendientes.
 
 ## 7. Criterio para cerrar un hallazgo
