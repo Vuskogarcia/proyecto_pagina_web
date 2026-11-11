@@ -1,0 +1,45 @@
+# escenario=registro etiqueta=argon2-django-r2 inicio=2026-11-11 00:44:17 -0500
+# k6=k6.exe v2.3.0 (commit/e088784614, go1.26.8, windows/amd64)
+# BASE_URL=http://127.0.0.1:8001 VUS=por defecto DURACION=por defecto
+
+
+  █ THRESHOLDS 
+
+    http_req_duration{nombre:registro}
+    ✓ 'p(95)<1500' p(95)=150.26ms
+
+    http_req_failed{escenario:registro}
+    ✓ 'rate<0.01' rate=0.00%
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 1102    18.050845/s
+    checks_succeeded...: 100.00% 1102 out of 1102
+    checks_failed......: 0.00%   0 out of 1102
+
+    ✓ registro 201
+    ✓ registro crea un cliente con ese email
+
+    HTTP
+    http_req_duration..............: avg=50.97ms  min=0s      med=57.68ms p(90)=111.07ms p(95)=123.39ms p(99)=220.62ms max=369.24ms count=1102
+      { expected_response:true }...: avg=50.97ms  min=0s      med=57.68ms p(90)=111.07ms p(95)=123.39ms p(99)=220.62ms max=369.24ms count=1102
+      { nombre:registro }..........: avg=100.27ms min=56.49ms med=93.37ms p(90)=123.41ms p(95)=150.26ms p(99)=289.56ms max=369.24ms count=551 
+    http_req_failed................: 0.00%  0 out of 1102
+      { escenario:registro }.......: 0.00%  0 out of 1102
+    http_reqs......................: 1102   18.050845/s
+
+    EXECUTION
+    iteration_duration.............: avg=1.1s     min=1.05s   med=1.09s   p(90)=1.12s    p(95)=1.16s    p(99)=1.31s    max=1.39s    count=551 
+    iterations.....................: 551    9.025423/s
+    vus............................: 4      min=4         max=10
+    vus_max........................: 10     min=10        max=10
+
+    NETWORK
+    data_received..................: 812 kB 13 kB/s
+    data_sent......................: 247 kB 4.1 kB/s
+
+
+
+# hash_usuarios_de_carga: argon2$argon2id$v=19$m=102400,t=2,p=8|601
+# fin=2026-11-11 00:45:18 -0500 codigo_salida_k6=0 (99 = algún umbral no se cumplió)

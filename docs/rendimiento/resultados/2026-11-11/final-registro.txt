@@ -1,0 +1,45 @@
+# escenario=registro etiqueta=final inicio=2026-11-11 00:48:09 -0500
+# k6=k6.exe v2.3.0 (commit/e088784614, go1.26.8, windows/amd64)
+# BASE_URL=http://127.0.0.1:8001 VUS=por defecto DURACION=por defecto
+
+
+  █ THRESHOLDS 
+
+    http_req_duration{nombre:registro}
+    ✓ 'p(95)<1500' p(95)=151.52ms
+
+    http_req_failed{escenario:registro}
+    ✓ 'rate<0.01' rate=0.00%
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 1110    18.181216/s
+    checks_succeeded...: 100.00% 1110 out of 1110
+    checks_failed......: 0.00%   0 out of 1110
+
+    ✓ registro 201
+    ✓ registro crea un cliente con ese email
+
+    HTTP
+    http_req_duration..............: avg=46.41ms min=0s      med=56.21ms p(90)=102.57ms p(95)=123.31ms p(99)=175.22ms max=283.56ms count=1110
+      { expected_response:true }...: avg=46.41ms min=0s      med=56.21ms p(90)=102.57ms p(95)=123.31ms p(99)=175.22ms max=283.56ms count=1110
+      { nombre:registro }..........: avg=91.21ms min=57.05ms med=83.42ms p(90)=123.35ms p(95)=151.52ms p(99)=208.27ms max=283.56ms count=555 
+    http_req_failed................: 0.00%  0 out of 1110
+      { escenario:registro }.......: 0.00%  0 out of 1110
+    http_reqs......................: 1110   18.181216/s
+
+    EXECUTION
+    iteration_duration.............: avg=1.09s   min=1.05s   med=1.08s   p(90)=1.12s    p(95)=1.15s    p(99)=1.23s    max=1.3s     count=555 
+    iterations.....................: 555    9.090608/s
+    vus............................: 3      min=3         max=10
+    vus_max........................: 10     min=10        max=10
+
+    NETWORK
+    data_received..................: 818 kB 13 kB/s
+    data_sent......................: 249 kB 4.1 kB/s
+
+
+
+# hash_usuarios_de_carga: argon2$argon2id$v=19$m=65536,t=3,p=4|605
+# fin=2026-11-11 00:49:10 -0500 codigo_salida_k6=0 (99 = algún umbral no se cumplió)

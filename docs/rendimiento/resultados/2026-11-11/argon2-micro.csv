@@ -1,0 +1,6 @@
+# fecha=2026-11-11 00:36:24 -0500 python=3.12.10 argon2-cffi=25.1.0 cpu_logicos=22 so=Windows-11-10.0.26200-SP0
+# 50 hashes por configuración, secuenciales, misma clave y sal aleatoria
+configuracion,t,m_kib,p,p50_ms,p95_ms,p99_ms,min_ms,max_ms
+django-por-defecto,2,102400,8,40.0,44.5,51.9,38.5,55.3
+rfc9106-segunda-recomendada,3,65536,4,42.2,46.1,47.3,40.1,47.7
+owasp-minima,2,19456,1,19.4,23.7,33.1,18.0,39.8

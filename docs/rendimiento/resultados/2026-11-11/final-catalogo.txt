@@ -1,0 +1,50 @@
+# escenario=catalogo etiqueta=final inicio=2026-11-11 00:45:57 -0500
+# k6=k6.exe v2.3.0 (commit/e088784614, go1.26.8, windows/amd64)
+# BASE_URL=http://127.0.0.1:8001 VUS=por defecto DURACION=por defecto
+
+
+  █ THRESHOLDS 
+
+    http_req_duration{nombre:catalogo_detalle}
+    ✓ 'p(95)<300' p(95)=36.86ms
+
+    http_req_duration{nombre:catalogo_lista}
+    ✓ 'p(95)<300' p(95)=35.95ms
+
+    http_req_failed{escenario:catalogo}
+    ✓ 'rate<0.01' rate=0.00%
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 6666    110.134089/s
+    checks_succeeded...: 100.00% 6666 out of 6666
+    checks_failed......: 0.00%   0 out of 6666
+
+    ✓ lista 200
+    ✓ lista trae productos
+    ✓ detalle 200
+
+    HTTP
+    http_req_duration...............: avg=21.06ms  min=504.29µs med=18.62ms  p(90)=34.23ms p(95)=36.29ms  p(99)=49.1ms   max=84.54ms  count=4445
+      { expected_response:true }....: avg=21.06ms  min=504.29µs med=18.62ms  p(90)=34.23ms p(95)=36.29ms  p(99)=49.1ms   max=84.54ms  count=4445
+      { nombre:catalogo_detalle }...: avg=20.91ms  min=504.29µs med=16.51ms  p(90)=34.13ms p(95)=36.86ms  p(99)=54.77ms  max=80.51ms  count=2222
+      { nombre:catalogo_lista }.....: avg=21.2ms   min=1.18ms   med=20.02ms  p(90)=34.34ms p(95)=35.95ms  p(99)=43.23ms  max=84.54ms  count=2222
+    http_req_failed.................: 0.00%  0 out of 4445
+      { escenario:catalogo }........: 0.00%  0 out of 4445
+    http_reqs.......................: 4445   73.439248/s
+
+    EXECUTION
+    iteration_duration..............: avg=542.73ms min=512.07ms med=541.56ms p(90)=563.8ms p(95)=568.03ms p(99)=601.44ms max=643.13ms count=2222
+    iterations......................: 2222   36.711363/s
+    vus.............................: 20     min=20        max=20
+    vus_max.........................: 20     min=20        max=20
+
+    NETWORK
+    data_received...................: 6.2 MB 102 kB/s
+    data_sent.......................: 378 kB 6.2 kB/s
+
+
+
+# hash_usuarios_de_carga: argon2$argon2id$v=19$m=65536,t=3,p=4|50
+# fin=2026-11-11 00:46:59 -0500 codigo_salida_k6=0 (99 = algún umbral no se cumplió)

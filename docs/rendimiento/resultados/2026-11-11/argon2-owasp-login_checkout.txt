@@ -1,0 +1,51 @@
+# escenario=login_checkout etiqueta=argon2-owasp inicio=2026-11-11 00:42:46 -0500
+# k6=k6.exe v2.3.0 (commit/e088784614, go1.26.8, windows/amd64)
+# BASE_URL=http://127.0.0.1:8001 VUS=por defecto DURACION=por defecto
+
+
+  █ THRESHOLDS 
+
+    http_req_duration{nombre:checkout}
+    ✓ 'p(95)<800' p(95)=195.72ms
+
+    http_req_duration{nombre:login}
+    ✓ 'p(95)<1000' p(95)=211.34ms
+
+    http_req_failed{escenario:login_checkout}
+    ✓ 'rate<0.01' rate=0.00%
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 1200    19.98815/s
+    checks_succeeded...: 100.00% 1200 out of 1200
+    checks_failed......: 0.00%   0 out of 1200
+
+    ✓ login 200
+    ✓ checkout 201
+    ✓ checkout trae código PED-
+    ✓ logout 204
+
+    HTTP
+    http_req_duration................: avg=103.88ms min=1.03ms  med=97.79ms  p(90)=174.02ms p(95)=193.46ms p(99)=217.58ms max=290.45ms count=1201
+      { expected_response:true }.....: avg=103.88ms min=1.03ms  med=97.79ms  p(90)=174.02ms p(95)=193.46ms p(99)=217.58ms max=290.45ms count=1201
+      { nombre:checkout }............: avg=139.73ms min=44.69ms med=142.26ms p(90)=184.03ms p(95)=195.72ms p(99)=208.57ms max=219.22ms count=300 
+      { nombre:login }...............: avg=131.61ms min=65.11ms med=115.14ms p(90)=197.99ms p(95)=211.34ms p(99)=269.17ms max=290.45ms count=300 
+    http_req_failed..................: 0.00%  0 out of 1201
+      { escenario:login_checkout }...: 0.00%  0 out of 1201
+    http_reqs........................: 1201   20.004807/s
+
+    EXECUTION
+    iteration_duration...............: avg=4s       min=3.99s   med=4s       p(90)=4s       p(95)=4s       p(99)=4s       max=4s       count=300 
+    iterations.......................: 300    4.997038/s
+    vus..............................: 20     min=20        max=20
+    vus_max..........................: 20     min=20        max=20
+
+    NETWORK
+    data_received....................: 1.1 MB 18 kB/s
+    data_sent........................: 332 kB 5.5 kB/s
+
+
+
+# hash_usuarios_de_carga: argon2$argon2id$v=19$m=19456,t=2,p=1|50
+# fin=2026-11-11 00:43:47 -0500 codigo_salida_k6=0 (99 = algún umbral no se cumplió)
