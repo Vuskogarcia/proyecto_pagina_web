@@ -33,8 +33,10 @@ El detalle criterio por criterio está en [`docs/historias-implementadas.md`](do
 | **psycopg2** | 2.9+ | el driver que conecta Django con PostgreSQL | Django no podría hablar con la base de datos |
 | **python-dotenv** | 1.x | lee la configuración desde el archivo `.env` | habría que poner contraseñas en el código |
 | **whitenoise** | 6.x | sirve el CSS de la interfaz cuando `DEBUG=False` | la interfaz saldría sin estilos en producción |
+| **argon2-cffi** | 23.1+ | hash de contraseñas **Argon2id** (t=3, m=64 MiB, p=4; [elección medida](docs/rendimiento/argon2.md)) | las contraseñas quedarían con PBKDF2, más barato de atacar con GPU |
 | **Docker Compose** | — | levanta PostgreSQL con un solo comando | cada integrante tendría que instalar y configurar Postgres a mano |
 | **GitHub Actions** | — | corre las pruebas en cada push, en un computador que no es el tuyo | «en mi máquina funciona» seguiría siendo una defensa |
+| **k6** + **waitress** | 2.3 · 3.0 | pruebas de carga ([`docs/rendimiento/`](docs/rendimiento/instrucciones.md)); no se instalan en producción ni en el CI | los umbrales de rendimiento serían una opinión |
 
 ---
 
@@ -49,8 +51,13 @@ proyecto_pagina_web/
 ├── .github/workflows/ci.yml     ← qué hace el servidor en cada push
 │
 ├── database/                    ← scripts SQL del modelo E-R (esquema y datos de ejemplo)
+├── CHANGELOG.md                 ← notas de la versión (1.0.0-rc1)
 ├── docs/                        ← visión, historias, decisiones, problema duro
-│   └── historias-implementadas.md   qué historia prueba cada test
+│   ├── historias-implementadas.md   qué historia prueba cada test
+│   ├── seguridad-y-rnf.md           registro único de seguridad y RNF (Módulo 7)
+│   ├── triage-rc.md                 triage y congelación del release candidate
+│   ├── seguridad/                   modelo de amenazas, auditoría, rotación de claves, evidencia
+│   └── rendimiento/                 pruebas de carga con k6, resultados y Argon2id
 │
 └── tests/                       ← EL PROYECTO DJANGO
     ├── manage.py                    el punto de arranque (comandos de Django)
@@ -102,7 +109,7 @@ Cada módulo repite los mismos papeles:
 | `NoAutenticado` | 401 | la operación requiere iniciar sesión |
 | `DemasiadosIntentos` | 429 | se superó el límite de intentos de inicio de sesión o de peticiones |
 
-Los servicios lanzan estas excepciones y el decorador `@api` (`comun/http.py`) las convierte en una respuesta JSON con su código HTTP. Además, `@api` exige sesión (y el rol de agente o administrador donde corresponde) y atrapa cualquier error no previsto: al cliente le devuelve un 500 genérico y el detalle queda en el log. Las validaciones de entrada (`entero`, `texto`, `dinero`, `booleano`) están en `comun/validaciones.py`, separadas de HTTP. Funcionan con **lista de permitidos**: solo enteros de verdad, con cota, y texto sin caracteres que PostgreSQL rechaza. El detalle está en [`docs/seguridad/`](docs/seguridad/semana-13.md).
+Los servicios lanzan estas excepciones y el decorador `@api` (`comun/http.py`) las convierte en una respuesta JSON con su código HTTP. Además, `@api` exige sesión (y el rol de agente o administrador donde corresponde) y atrapa cualquier error no previsto: al cliente le devuelve un 500 genérico con un **identificador de seguimiento** (`id_error`), y el detalle queda en el log con ese mismo id. Las validaciones de entrada (`entero`, `texto`, `dinero`, `booleano`) están en `comun/validaciones.py`, separadas de HTTP. Funcionan con **lista de permitidos**: solo enteros de verdad, con cota, y texto sin caracteres que PostgreSQL rechaza. El detalle está en [`docs/seguridad/`](docs/seguridad/semana-13.md).
 
 ---
 
@@ -287,10 +294,15 @@ Cada módulo tiene una carpeta `pruebas/` con tres tipos de archivo:
 | `comun/pruebas/test_seguridad.py` | seguridad | hallazgos de la auditoría (ADL-01 a ADL-07, H13, H14) y HU-01 | 25 |
 | `comun/pruebas/test_ataques_simulados.py` | seguridad | ataques simulados de la semana 13: SQLi, XSS, IDOR, divulgación, fuerza bruta | 11 |
 | `cuentas/pruebas/test_auditoria_y_limites.py` | seguridad | registro de eventos críticos y límite de peticiones | 9 |
+| `comun/pruebas/test_m7_h01_tamano_cuerpo.py` | seguridad | Módulo 7 · Historia 01: cuerpo > 64 KB → 413 | 5 |
+| `comun/pruebas/test_m7_h03_redos.py` | seguridad | Módulo 7 · Historia 03: ReDoS (50 000 caracteres) y regex sin cuantificadores anidados | 10 |
+| `cuentas/pruebas/test_m7_h04_argon2.py` | seguridad | Módulo 7 · Historia 04: Argon2id y migración desde PBKDF2 | 7 |
+| `comun/pruebas/test_m7_h05_claves_revocadas.py` | seguridad | Módulo 7 · Historia 05: claves del historial de Git revocadas | 5 |
+| `comun/pruebas/test_m7_h06_id_error.py` | seguridad | Módulo 7 · Historia 06: id de seguimiento en los 500 | 6 |
 | `web/pruebas/test_interfaz.py` | integración (web) | HU-01, HU-04 a HU-09 desde la interfaz | 15 |
-| | | | **172** |
+| | | | **205** |
 
-Hay **71 pruebas de seguridad** (todos los archivos `test_seguridad*`, `test_ataques_simulados` y `test_auditoria_y_limites`). Las de concurrencia (`HU08ConcurrenciaTests` y `CambioDeEstadoConcurrenteTests`) **necesitan PostgreSQL**.
+Hay **104 pruebas de seguridad** (todos los archivos `test_seguridad*`, `test_ataques_simulados`, `test_auditoria_y_limites` y `test_m7_*`). La suite completa corre en unos 13 s contra PostgreSQL: durante `manage.py test` Argon2id usa costo mínimo. Las de concurrencia (`HU08ConcurrenciaTests` y `CambioDeEstadoConcurrenteTests`) **necesitan PostgreSQL**.
 
 `comun/fabricas.py` **no tiene pruebas**: es una fábrica de datos de prueba que crea clientes, productos, pedidos y tickets ya listos, para no repetir las mismas líneas en cada test.
 
@@ -348,6 +360,7 @@ def test_criterio2_un_ticket_ya_tomado_responde_409(self):
 | --- | --- | --- |
 | `ImproperlyConfigured: Falta SECRET_KEY` | el `.env` no tiene `SECRET_KEY` | genera una (paso 4.2) y pégala en `tests/.env` |
 | `SECRET_KEY es de ejemplo o muy corta` | `DEBUG` está apagado y la clave es la de ejemplo | pon `DEBUG=True` en tu `.env` local o usa una clave real |
+| `SECRET_KEY revocada` | tu `.env` usa una de las claves que quedaron en el historial de Git (DT-13) | genera una nueva (paso 4.2); ver [rotación](docs/seguridad/rotacion-secret-key.md) |
 | la página sale sin estilos con `DEBUG=False` | faltan los estáticos | `python manage.py collectstatic` |
 | `connection refused` en el puerto 5432 | PostgreSQL no está corriendo | abre Docker Desktop y corre `docker compose up -d db` |
 | `No se puede cargar el archivo ...\Activate.ps1` | PowerShell bloquea scripts | `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` |
@@ -375,8 +388,13 @@ def test_criterio2_un_ticket_ya_tomado_responde_409(self):
 - [Definición de Terminado](docs/definicion-de-terminado.md)
 - [Revisión de código (SOLID/GRASP) y refactorizaciones](docs/revision-codigo.md)
 - [Registro de deuda técnica](docs/deuda-tecnica.md)
+- **[Seguridad y RNF: registro único del Módulo 7 (12 historias, checklist OWASP)](docs/seguridad-y-rnf.md)**
 - [Seguridad, semana 13: evidencia y checklist](docs/seguridad/semana-13.md)
 - [Modelo de amenazas](docs/seguridad/modelo-amenazas.md)
 - [Correcciones de seguridad y RNF](docs/seguridad/correcciones-seguridad.md)
-- [AI Decision Log de la auditoría de seguridad](docs/seguridad/ai-decision-log-seguridad.md)
+- [AI Decision Log de la auditoría de seguridad](docs/seguridad/ai-decision-log-seguridad.md) (con el veredicto de H1–H14)
+- [Rotación de la SECRET_KEY y cierre de DT-13](docs/seguridad/rotacion-secret-key.md)
+- [Pruebas de carga con k6](docs/rendimiento/instrucciones.md) · [resultados 2026-11-11](docs/rendimiento/resultados-2026-11-11.md) · [parámetros de Argon2id](docs/rendimiento/argon2.md)
+- [Triage del release candidate y congelación de alcance](docs/triage-rc.md)
+- [Notas de la versión (CHANGELOG)](CHANGELOG.md)
 - [Interfaz web: paleta y pantallas](docs/interfaz.md)

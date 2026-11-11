@@ -11,7 +11,7 @@
 | Rol asignado a la IA | Auditor adversarial y mentor socrático (sin entregar parches) |
 | Integrante responsable | `[DECISIÓN DEL EQUIPO]` |
 | Código auditado | `main` @ `0040777` |
-| Documento relacionado | `docs/seguridad-y-rnf.md` |
+| Documento relacionado | [`docs/seguridad-y-rnf.md`](../seguridad-y-rnf.md) (registro único del Módulo 7) |
 
 ## 1. Fila para la tabla de `docs/uso-ia.md` (formato actual del equipo)
 
@@ -23,7 +23,7 @@
 
 ## 2. Recomendaciones de la IA y decisiones humanas
 
-Nivel de evidencia según `seguridad-y-rnf.md` §1: E0 lectura de código · E1 hecho del lenguaje · E2 sondeo de la IA · E3/E4 prueba del equipo.
+Nivel de evidencia según [`seguridad-y-rnf.md` §1](../seguridad-y-rnf.md#1-niveles-de-evidencia): E0 lectura de código · E1 hecho del lenguaje · E2 sondeo de la IA · E3/E4 prueba del equipo.
 
 | ID | Recomendación de la IA | Basada en | Postura de la IA (no vinculante) | Decisión humana | Justificación humana | Evidencia ejecutada por el equipo | Commit / PR |
 | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -36,7 +36,7 @@ Nivel de evidencia según `seguridad-y-rnf.md` §1: E0 lectura de código · E1 
 | ADL-07 | Desactivar `DEBUG` por defecto y eliminar el `SECRET_KEY` de respaldo. | H11 (E0) | Bajo costo; revisar el impacto en el flujo de desarrollo. | | | | |
 | ADL-08 | Rotar o purgar los secretos del historial de Git. | H12 (E2) | Solo procede si hubo un despliegue. Purgar el historial afecta a todo el equipo. | | | | |
 | ADL-09 | Usar `django.test.TestCase`, `self.client` y `TransactionTestCase` en lugar de JUnit o RestAssured. | Stack real del proyecto (E0) | Coherente con el proyecto. | | | | |
-| ADL-10 | Escribir primero una prueba roja con predicción explícita y aserciones sobre la base de datos, e incluir un caso positivo. | Método | Requisito para cerrar hallazgos (`seguridad-y-rnf.md` §7). | | | | |
+| ADL-10 | Escribir primero una prueba roja con predicción explícita y aserciones sobre la base de datos, e incluir un caso positivo. | Método | Requisito para cerrar hallazgos ([`seguridad-y-rnf.md` §7](../seguridad-y-rnf.md#7-criterio-para-cerrar-un-hallazgo)). | | | | |
 
 ## 3. Afirmaciones de la IA corregidas o retractadas
 
@@ -55,7 +55,7 @@ Para que la revisión humana sea transparente, se registran los errores y las im
 - Las ejecuciones de la IA se hicieron en su propio entorno: SQLite, Python 3.12.3, Django 6.1.2. **No** se ejecutó nada en PostgreSQL y **no** se revisaron los resultados del CI.
 - Ninguna recomendación es una decisión. Según la política de `uso-ia.md`, las decisiones de diseño y de lógica de negocio corresponden al equipo.
 - La IA no escribió correcciones ni pruebas definitivas para el repositorio. Las pruebas versionadas deben ser del equipo, según la buena práctica de `uso-ia.md` §3.
-- Haber superado las pruebas registradas no permite declarar seguro el sistema (ver `seguridad-y-rnf.md` §0 y §6).
+- Haber superado las pruebas registradas no permite declarar seguro el sistema (ver [`seguridad-y-rnf.md` §0](../seguridad-y-rnf.md#0-advertencia) y [§6](../seguridad-y-rnf.md#6-lo-que-las-pruebas-no-demuestran)).
 
 ## 5. Implementación de las recomendaciones (sesión 2026-11-02)
 
