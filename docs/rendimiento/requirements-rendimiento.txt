@@ -1,0 +1,4 @@
+# Solo para las pruebas de carga (docs/rendimiento/instrucciones.md).
+# No se instala en el CI ni en producción.
+-r ../../tests/requirements.txt
+waitress==3.0.2
