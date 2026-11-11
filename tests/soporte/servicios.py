@@ -54,7 +54,9 @@ def crear_ticket(cliente_id, descripcion, pedido_id=None, asunto="", tipo=None):
     return ticket
 
 
-ORDENES_COLA = {"antiguos": "creado_en", "recientes": "-creado_en"}
+# El id desempata: dos tickets creados en el mismo instante (mismo
+# `creado_en`) salían en orden arbitrario y la prueba de orden fallaba a veces.
+ORDENES_COLA = {"antiguos": ("creado_en", "id"), "recientes": ("-creado_en", "-id")}
 
 
 def cola_sin_asignar(orden="antiguos"):
@@ -65,7 +67,7 @@ def cola_sin_asignar(orden="antiguos"):
     return (
         TicketSoporte.objects.filter(estado=TicketSoporte.ABIERTO, agente__isnull=True)
         .select_related("cliente", "pedido")
-        .order_by(ORDENES_COLA.get(orden, "creado_en"))
+        .order_by(*ORDENES_COLA.get(orden, ORDENES_COLA["antiguos"]))
     )
 
 
